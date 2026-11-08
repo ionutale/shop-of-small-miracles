@@ -111,6 +111,7 @@ describe('shop', () => {
 		initGame(42, serviceSave({ stock: [], quietDay: true, activeVisitId: null }));
 		render(ShopScreen);
 		expect(screen.getByText(/the shop is quiet/i)).toBeInTheDocument();
+		expect(screen.getByTestId('visitor-count')).toHaveTextContent('0 of 3');
 		expect(screen.queryByRole('button', { name: /^brew$/i })).not.toBeInTheDocument();
 		expect(screen.getByRole('button', { name: /^evening$/i })).toBeInTheDocument();
 	});

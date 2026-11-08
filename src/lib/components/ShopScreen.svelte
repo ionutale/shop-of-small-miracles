@@ -17,7 +17,11 @@
 	const result = $derived($game.lastResult);
 	const chapter = $derived(chapterForDay($game.day));
 	const beat = $derived(beatForDay($game.day));
-	const visitorNumber = $derived(Math.min($game.servedToday + (result ? 0 : 1), VISITS_PER_DAY));
+	const visitorNumber = $derived(
+		$game.quietDay
+			? $game.servedToday
+			: Math.min($game.servedToday + (result ? 0 : 1), VISITS_PER_DAY)
+	);
 	const shelf = $derived(
 		ELEMENTS.map((element) => ({
 			element,
