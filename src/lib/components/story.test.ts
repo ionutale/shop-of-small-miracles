@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/svelte';
+import { tick } from 'svelte';
 import userEvent from '@testing-library/user-event';
 import { get } from 'svelte/store';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -66,6 +67,43 @@ describe('morning scene', () => {
 
 		expect(screen.queryByText(/lost a wheel outside your door/i)).not.toBeInTheDocument();
 	});
+
+	it('does not let a chosen result hide the next choice day', async () => {
+		initGame(42, saveFixture({ day: 3, morningSeenDay: 0 }));
+		const user = userEvent.setup();
+
+		render(MorningScene);
+
+		await user.click(screen.getByRole('button', { name: /mend the wheel/i }));
+		expect(screen.getByText(/salt and thanks/i)).toBeInTheDocument();
+
+		game.set({ ...get(game), day: 6, morningSeenDay: 0 });
+		await tick();
+
+		expect(screen.queryByText(/salt and thanks/i)).not.toBeInTheDocument();
+		expect(screen.getByText(/too hot for the small room/i)).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /take her a new wick/i })).toBeInTheDocument();
+	});
+
+	it('restores a chosen result that has not been dismissed yet', () => {
+		initGame(42, saveFixture({ day: 3, morningSeenDay: 0, choices: ['d3-mend-cart'] }));
+
+		render(MorningScene);
+
+		expect(screen.getByText(/salt and thanks/i)).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: /mend the wheel/i })).not.toBeInTheDocument();
+	});
+
+	it('moves focus to Begin the day after a choice', async () => {
+		initGame(42, saveFixture({ day: 3, morningSeenDay: 0 }));
+		const user = userEvent.setup();
+
+		render(MorningScene);
+
+		await user.click(screen.getByRole('button', { name: /mend the wheel/i }));
+
+		expect(screen.getByRole('button', { name: /begin the day/i })).toHaveFocus();
+	});
 });
 
 describe('ending page', () => {
@@ -91,6 +129,33 @@ describe('ending page', () => {
 		expect(screen.getByText(ending.epilogue)).toBeInTheDocument();
 		expect(screen.getAllByTestId('ending-relationship')).toHaveLength(3);
 		expect(screen.getByText(/the shop chose to be/i)).toBeInTheDocument();
+	});
+
+	it('renders the small mercies the shop chose to keep', () => {
+		initGame(
+			42,
+			saveFixture({
+				day: 21,
+				chapter: 3,
+				phase: 'ending',
+				flags: ['readTheLetter', 'saltDebt', 'helpedWidow'],
+				reputation: 5
+			})
+		);
+
+		render(EndingPage);
+
+		expect(screen.getByText(/last letter is folded into the ledger/i)).toBeInTheDocument();
+		expect(screen.getByText(/box is still under the counter/i)).toBeInTheDocument();
+		expect(screen.getByText(/widow’s step is swept/i)).toBeInTheDocument();
+	});
+
+	it('moves focus to the ending title', () => {
+		initGame(42, saveFixture({ day: 21, chapter: 3, phase: 'ending' }));
+
+		render(EndingPage);
+
+		expect(screen.getByRole('heading', { name: ENDINGS[0].title })).toHaveFocus();
 	});
 
 	it('offers a new game from the final page', async () => {

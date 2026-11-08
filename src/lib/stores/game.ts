@@ -257,12 +257,12 @@ export function leaveRentScene(): void {
 	game.set(continueAfterRentState(get(game)));
 }
 
-/** Takes an authored morning option and closes that morning's card. */
+/** Takes an authored morning option; the card stays until Begin the day. */
 export function chooseStoryOption(optionId: string): void {
 	const current = get(game);
 	const next = applyChoice(current, optionId);
 	if (next === current) return;
-	game.set({ ...next, morningSeenDay: current.day });
+	game.set(next);
 }
 
 /** Opens the day without taking a choice, when the day has no authored one. */

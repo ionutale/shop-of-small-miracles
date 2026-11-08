@@ -1,6 +1,7 @@
 import type { ContentBundle } from '../types';
 import { CHAPTERS } from './chapters';
 import { CHARACTERS } from './characters';
+import { CHOICES } from './choices';
 import { ELEMENTS } from './elements';
 import { ENDINGS } from './endings';
 import { POTIONS } from './potions';
@@ -15,5 +16,6 @@ export const CONTENT: ContentBundle = {
 	characters: CHARACTERS,
 	chapters: CHAPTERS,
 	upgrades: UPGRADES,
-	endings: ENDINGS
+	endings: ENDINGS,
+	choices: CHOICES
 };

@@ -14,6 +14,17 @@ export interface ValidateOptions {
 
 const TAG_SET = new Set<Tag>(TAGS);
 
+const ARC_IDS = ['widow', 'merchant', 'apprentice'] as const;
+
+/** The flags the authored arc is allowed to set. */
+const STORY_FLAGS = new Set([
+	'helpedWidow',
+	'readTheLetter',
+	'saltDebt',
+	'keptTheChair',
+	'closedTheShop'
+]);
+
 function isTag(value: unknown): value is Tag {
 	return typeof value === 'string' && TAG_SET.has(value as Tag);
 }
@@ -231,7 +242,7 @@ export function validateContent(
 		if (arcs.size !== 3) errors.push(`expected 3 recurring arcs, found ${arcs.size}`);
 	}
 
-	// Upgrades and endings are optional during the content-only slice.
+	// Upgrades are optional during the content-only slice.
 	const upgradeIds = new Set<string>();
 	for (const upgrade of upgrades) {
 		if (upgradeIds.has(upgrade.id)) errors.push(`duplicate upgrade id: ${upgrade.id}`);
@@ -245,9 +256,68 @@ export function validateContent(
 	if (options.full && upgrades.length !== 12) {
 		errors.push(`expected 12 upgrades, found ${upgrades.length}`);
 	}
+
+	const endingIds = new Set<string>();
 	for (const ending of endings) {
+		if (endingIds.has(ending.id)) errors.push(`duplicate ending id: ${ending.id}`);
+		endingIds.add(ending.id);
 		if (!ending.title.trim()) errors.push(`ending ${ending.id} has no title`);
 		if (!ending.epilogue.trim()) errors.push(`ending ${ending.id} has no epilogue`);
+	}
+	if (options.full && endings.length !== 3) {
+		errors.push(`expected 3 endings, found ${endings.length}`);
+	}
+
+	const choices = content.choices ?? [];
+	const choiceIds = new Set<string>();
+	const optionIds = new Set<string>();
+	const choiceDays = new Set<number>();
+	for (const choice of choices) {
+		if (choiceIds.has(choice.id)) errors.push(`duplicate choice id: ${choice.id}`);
+		choiceIds.add(choice.id);
+
+		if (!Number.isInteger(choice.day) || choice.day < 1 || choice.day > TOTAL_DAYS) {
+			errors.push(`choice ${choice.id} has an impossible day: ${choice.day}`);
+		} else if (choiceDays.has(choice.day)) {
+			errors.push(`more than one choice on day ${choice.day}`);
+		} else {
+			choiceDays.add(choice.day);
+		}
+
+		if (!choice.prompt.trim()) errors.push(`choice ${choice.id} has no prompt`);
+		if (choice.options.length < 2) {
+			errors.push(`choice ${choice.id} needs at least two options`);
+		}
+
+		for (const option of choice.options) {
+			if (optionIds.has(option.id)) errors.push(`duplicate choice option id: ${option.id}`);
+			optionIds.add(option.id);
+			if (!option.label.trim()) errors.push(`choice option ${option.id} has no label`);
+			if (!option.result.trim()) errors.push(`choice option ${option.id} has no result`);
+
+			for (const flag of option.effects.flags ?? []) {
+				if (!STORY_FLAGS.has(flag)) errors.push(`unknown story flag: ${flag}`);
+			}
+
+			for (const [arc, delta] of Object.entries(option.effects.relationships ?? {})) {
+				if (!ARC_IDS.includes(arc as (typeof ARC_IDS)[number])) {
+					errors.push(`unknown relationship arc: ${arc}`);
+				} else if (!Number.isInteger(delta) || Math.abs(delta) > 10) {
+					errors.push(`choice option ${option.id} has an invalid relationship delta`);
+				}
+			}
+
+			const reputation = option.effects.reputation;
+			if (
+				reputation !== undefined &&
+				(!Number.isInteger(reputation) || Math.abs(reputation) > 10)
+			) {
+				errors.push(`choice option ${option.id} has an invalid reputation delta`);
+			}
+		}
+	}
+	if (options.full && choices.length === 0) {
+		errors.push('no authored story choices');
 	}
 
 	return { ok: errors.length === 0, errors };

@@ -62,6 +62,65 @@ describe('validateContent', () => {
 		expect(CONTENT.characters).toHaveLength(30);
 		expect(VISITS).toHaveLength(63);
 		expect(CONTENT.upgrades).toHaveLength(12);
+		expect(CONTENT.endings).toHaveLength(3);
+		expect(CONTENT.choices).toHaveLength(10);
+	});
+
+	it('rejects duplicate choice options, duplicate choice days, and a wrong ending count', () => {
+		const broken: ContentBundle = {
+			...CONTENT,
+			endings: [],
+			choices: [
+				{
+					id: 'day-1',
+					day: 1,
+					prompt: 'A prompt.',
+					options: [
+						{ id: 'same', label: 'One', result: 'One.', effects: {} },
+						{ id: 'same', label: 'Two', result: 'Two.', effects: {} }
+					]
+				},
+				{
+					id: 'day-1-again',
+					day: 1,
+					prompt: 'Another prompt.',
+					options: [
+						{ id: 'other-a', label: 'One', result: 'One.', effects: {} },
+						{ id: 'other-b', label: 'Two', result: 'Two.', effects: {} }
+					]
+				}
+			]
+		};
+
+		const result = validateContent(broken, { full: true });
+		const errors = result.errors.join(' ');
+
+		expect(result.ok).toBe(false);
+		expect(errors).toMatch(/duplicate choice option id/i);
+		expect(errors).toMatch(/more than one choice on day 1/i);
+		expect(errors).toMatch(/expected 3 endings/i);
+	});
+
+	it('rejects a choice that references an unknown story flag', () => {
+		const broken: ContentBundle = {
+			...CONTENT,
+			choices: [
+				{
+					id: 'day-1',
+					day: 1,
+					prompt: 'A prompt.',
+					options: [
+						{ id: 'a', label: 'One', result: 'One.', effects: { flags: ['inventedFlag'] } },
+						{ id: 'b', label: 'Two', result: 'Two.', effects: {} }
+					]
+				}
+			]
+		};
+
+		const result = validateContent(broken, { full: true });
+
+		expect(result.ok).toBe(false);
+		expect(result.errors.join(' ')).toMatch(/unknown story flag: inventedFlag/i);
 	});
 
 	it('rejects a potion with an unknown tag', () => {

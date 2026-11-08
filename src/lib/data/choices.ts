@@ -1,25 +1,6 @@
-import type { ArcId } from '../types';
+import type { ChoiceEffects, ChoiceOption, ChoiceRecord } from '../types';
 
-export interface ChoiceEffects {
-	flags?: readonly string[];
-	relationships?: Partial<Record<ArcId, number>>;
-	reputation?: number;
-}
-
-export interface ChoiceOption {
-	id: string;
-	label: string;
-	/** The line the shop reads back after the choice. */
-	result: string;
-	effects: ChoiceEffects;
-}
-
-export interface ChoiceRecord {
-	id: string;
-	day: number;
-	prompt: string;
-	options: readonly ChoiceOption[];
-}
+export type { ChoiceEffects, ChoiceOption, ChoiceRecord };
 
 /**
  * One authored choice on a morning-scene day. The first option of each choice
@@ -56,7 +37,7 @@ export const CHOICES: readonly ChoiceRecord[] = [
 				id: 'd6-new-wick',
 				label: 'Take her a new wick',
 				result: 'She lets you in. The lamp burns low and steady, and she talks about her husband.',
-				effects: { relationships: { widow: 2 } }
+				effects: { flags: ['helpedWidow'], relationships: { widow: 2 } }
 			},
 			{
 				id: 'd6-leave-lamp',

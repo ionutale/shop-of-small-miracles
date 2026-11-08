@@ -79,6 +79,27 @@ export interface EndingRecord {
 	epilogue: string;
 }
 
+export interface ChoiceEffects {
+	flags?: readonly string[];
+	relationships?: Partial<Record<ArcId, number>>;
+	reputation?: number;
+}
+
+export interface ChoiceOption {
+	id: string;
+	label: string;
+	/** The line the shop reads back after the choice. */
+	result: string;
+	effects: ChoiceEffects;
+}
+
+export interface ChoiceRecord {
+	id: string;
+	day: number;
+	prompt: string;
+	options: readonly ChoiceOption[];
+}
+
 export interface StockEntry {
 	elementId: string;
 	units: number;
@@ -162,4 +183,5 @@ export interface ContentBundle {
 	chapters: readonly ChapterRecord[];
 	upgrades: readonly UpgradeRecord[];
 	endings: readonly EndingRecord[];
+	choices?: readonly ChoiceRecord[];
 }

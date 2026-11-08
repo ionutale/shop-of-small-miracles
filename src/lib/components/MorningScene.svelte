@@ -1,29 +1,26 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+	import { choiceForOption } from '../data/choices';
 	import { beatForDay, chapterForDay } from '../data/chapters';
 	import { morningChoices, morningDue } from '../game/story';
 	import { chooseStoryOption, dismissMorning, game } from '../stores/game';
 
-	let chosen = $state<string | null>(null);
+	let beginButton = $state<HTMLButtonElement | undefined>();
 
-	const visible = $derived(Boolean(chosen) || morningDue($game));
+	const visible = $derived(morningDue($game));
 	const chapter = $derived(chapterForDay($game.day));
 	const beat = $derived(beatForDay($game.day));
 	const choices = $derived(morningChoices($game));
-	const chosenResult = $derived(
-		chosen
-			? (choices.flatMap((choice) => choice.options).find((option) => option.id === chosen)
-					?.result ?? null)
-			: null
+	const todaysOptionIds = $derived(
+		new Set(choices.flatMap((choice) => choice.options.map((option) => option.id)))
 	);
+	const chosen = $derived($game.choices.find((id) => todaysOptionIds.has(id)) ?? null);
+	const chosenResult = $derived(chosen ? (choiceForOption(chosen)?.option.result ?? null) : null);
 
-	function choose(optionId: string): void {
+	async function choose(optionId: string): Promise<void> {
 		chooseStoryOption(optionId);
-		chosen = optionId;
-	}
-
-	function begin(): void {
-		dismissMorning();
-		chosen = null;
+		await tick();
+		beginButton?.focus();
 	}
 </script>
 
@@ -36,7 +33,9 @@
 			{#if chosenResult}
 				<p class="result" role="status">{chosenResult}</p>
 			{/if}
-			<button class="begin" type="button" onclick={begin}>Begin the day</button>
+			<button class="begin" type="button" bind:this={beginButton} onclick={dismissMorning}>
+				Begin the day
+			</button>
 		{:else if choices.length > 0}
 			{#each choices as choice (choice.id)}
 				<div class="choice">
@@ -51,7 +50,9 @@
 				</div>
 			{/each}
 		{:else}
-			<button class="begin" type="button" onclick={begin}>Begin the day</button>
+			<button class="begin" type="button" bind:this={beginButton} onclick={dismissMorning}>
+				Begin the day
+			</button>
 		{/if}
 	</section>
 {/if}

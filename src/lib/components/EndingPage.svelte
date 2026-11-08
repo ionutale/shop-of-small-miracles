@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { characterById } from '../data/characters';
 	import { relationshipHint } from '../game/book';
 	import { selectEnding } from '../game/story';
@@ -7,6 +8,8 @@
 
 	const ARCS: readonly ArcId[] = ['widow', 'merchant', 'apprentice'];
 
+	let heading = $state<HTMLHeadingElement | undefined>();
+
 	const ending = $derived(selectEnding($game));
 	const cast = $derived(
 		ARCS.flatMap((arc) => {
@@ -14,11 +17,26 @@
 			return character ? [{ character, value: $game.relationships[arc] ?? 0 }] : [];
 		})
 	);
+	const mercies = $derived(
+		[
+			$game.flags.includes('helpedWidow')
+				? 'The widow’s step is swept before the town wakes.'
+				: null,
+			$game.flags.includes('readTheLetter')
+				? 'The old alchemist’s last letter is folded into the ledger.'
+				: null,
+			$game.flags.includes('saltDebt')
+				? 'The salt merchant’s box is still under the counter, waiting for morning.'
+				: null
+		].filter((line): line is string => line !== null)
+	);
+
+	onMount(() => heading?.focus());
 </script>
 
 <article class="ending paper" data-testid="ending-page" aria-labelledby="ending-title">
 	<p class="hand kicker">day {$game.day} · the last page</p>
-	<h2 id="ending-title">{ending.title}</h2>
+	<h2 id="ending-title" tabindex="-1" bind:this={heading}>{ending.title}</h2>
 	<p class="chose">The shop chose to be…</p>
 	<p class="epilogue">{ending.epilogue}</p>
 
@@ -31,6 +49,15 @@
 			</li>
 		{/each}
 	</ul>
+
+	{#if mercies.length > 0}
+		<h3>Small mercies</h3>
+		<ul class="mercies">
+			{#each mercies as line (line)}
+				<li>{line}</li>
+			{/each}
+		</ul>
+	{/if}
 
 	<button class="new-game" type="button" onclick={() => resetGame()}>New game</button>
 </article>
@@ -92,6 +119,15 @@
 		padding: 0.5rem 0.7rem;
 		border-left: 2px solid rgba(176, 138, 79, 0.55);
 		background: rgba(255, 255, 255, 0.16);
+	}
+
+	.mercies {
+		display: grid;
+		gap: 0.35rem;
+		margin: 0 0 1.1rem;
+		padding-left: 1.1rem;
+		color: var(--ink-soft);
+		line-height: 1.4;
 	}
 
 	.name {

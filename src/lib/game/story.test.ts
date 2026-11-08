@@ -84,6 +84,13 @@ describe('applyChoice', () => {
 		expect(applyChoice(save, 'd3-mend-cart')).toEqual(save);
 	});
 
+	it('marks the widow kindness and the read letter as story flags', () => {
+		expect(applyChoice(saveFixture({ day: 6 }), 'd6-new-wick').flags).toContain('helpedWidow');
+		expect(applyChoice(saveFixture({ day: 13 }), 'd13-read-letter').flags).toContain(
+			'readTheLetter'
+		);
+	});
+
 	it('keeps relationships inside their 0–10 bounds', () => {
 		const save = saveFixture({
 			day: 10,
@@ -137,13 +144,17 @@ describe('morning choices in the store', () => {
 
 		chooseStoryOption('d3-mend-cart');
 
-		expect(get(game).morningSeenDay).toBe(3);
+		expect(get(game).morningSeenDay).toBe(0);
 		expect(get(game).choices).toContain('d3-mend-cart');
 
 		initGame(42);
 
 		expect(get(game).choices).toContain('d3-mend-cart');
 		expect(get(game).relationships.merchant).toBe(2);
+		expect(get(game).morningSeenDay).toBe(0);
+
+		dismissMorning();
+
 		expect(get(game).morningSeenDay).toBe(3);
 	});
 
