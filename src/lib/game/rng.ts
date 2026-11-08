@@ -23,3 +23,12 @@ export function pickIndex(state: number, length: number): IndexStep {
 	const index = length > 0 ? Math.floor(step.value * length) : 0;
 	return { index, state: step.state };
 }
+
+/**
+ * A per-day starting state. Days are independent of how many draws previous
+ * days used, so the same save seed and day always open with the same offers.
+ */
+export function dayRngState(seed: number, day: number): number {
+	const mixed = ((seed >>> 0) ^ Math.imul(day + 1, 0x9e3779b9)) >>> 0;
+	return nextRandom(mixed).state;
+}

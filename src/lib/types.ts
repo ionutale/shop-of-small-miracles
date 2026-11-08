@@ -134,3 +134,12 @@ export interface SaveState {
 	introSeen: boolean;
 	lastResult: BrewOutcome | null;
 }
+
+export interface ContentBundle {
+	elements: readonly ElementRecord[];
+	potions: readonly PotionRecord[];
+	characters: readonly CharacterRecord[];
+	chapters: readonly ChapterRecord[];
+	upgrades: readonly UpgradeRecord[];
+	endings: readonly EndingRecord[];
+}

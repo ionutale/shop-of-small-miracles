@@ -6,6 +6,7 @@
 	},
 	"include": [
 		"src",
+		"scripts",
 		"vite.config.ts",
 		"playwright.config.ts",
 		"prettier.config.js",
