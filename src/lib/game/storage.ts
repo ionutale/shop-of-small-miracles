@@ -1,4 +1,5 @@
-import type { BrewOutcome, Phase, SaveState } from '../types';
+import type { BrewOutcome, Phase, RentOutcome, SaveState } from '../types';
+import { BASE_SHELF_CAPACITY } from './economy';
 import { beginServiceDay } from './day';
 
 export const SAVE_KEY = 'small-miracles:save:v1';
@@ -47,6 +48,12 @@ export function createInitialSave(seed = 42): SaveState {
 		quietDay: false,
 		market: [],
 		upgrades: [],
+		shelfCapacity: BASE_SHELF_CAPACITY,
+		upgradeBoughtToday: false,
+		swappedToday: false,
+		apprenticeUsedToday: false,
+		warmStoveUsedToday: false,
+		rentOutcome: null,
 		settings: { sound: true, reduceMotion: false },
 		introSeen: true,
 		lastResult: null
@@ -61,6 +68,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isBrewOutcome(value: unknown): value is BrewOutcome {
 	return isRecord(value) && typeof value.kind === 'string' && Array.isArray(value.tags);
+}
+
+function isRentOutcome(value: unknown): value is RentOutcome {
+	return (
+		isRecord(value) &&
+		(value.kind === 'paid' || value.kind === 'shortfall') &&
+		typeof value.message === 'string'
+	);
 }
 
 /**
@@ -92,6 +107,11 @@ export function parseSave(raw: string | null): SaveState | null {
 	const base = createInitialSave(typeof value.seed === 'number' ? value.seed : 42);
 	const settings = isRecord(value.settings) ? value.settings : {};
 	const relationships = isRecord(value.relationships) ? value.relationships : {};
+	const upgrades = Array.isArray(value.upgrades) ? (value.upgrades as string[]) : [];
+	const shelfCapacity =
+		Number.isInteger(value.shelfCapacity) && (value.shelfCapacity as number) > 0
+			? (value.shelfCapacity as number)
+			: BASE_SHELF_CAPACITY + (upgrades.includes('shelf') ? 10 : 0);
 
 	return {
 		...base,
@@ -111,7 +131,16 @@ export function parseSave(raw: string | null): SaveState | null {
 		},
 		servedVisitIds: Array.isArray(value.servedVisitIds) ? (value.servedVisitIds as string[]) : [],
 		market: Array.isArray(value.market) ? (value.market as SaveState['market']) : [],
-		upgrades: Array.isArray(value.upgrades) ? (value.upgrades as string[]) : [],
+		upgrades,
+		shelfCapacity,
+		upgradeBoughtToday:
+			typeof value.upgradeBoughtToday === 'boolean' ? value.upgradeBoughtToday : false,
+		swappedToday: typeof value.swappedToday === 'boolean' ? value.swappedToday : false,
+		apprenticeUsedToday:
+			typeof value.apprenticeUsedToday === 'boolean' ? value.apprenticeUsedToday : false,
+		warmStoveUsedToday:
+			typeof value.warmStoveUsedToday === 'boolean' ? value.warmStoveUsedToday : false,
+		rentOutcome: isRentOutcome(value.rentOutcome) ? value.rentOutcome : null,
 		settings: {
 			sound: typeof settings.sound === 'boolean' ? settings.sound : true,
 			reduceMotion: typeof settings.reduceMotion === 'boolean' ? settings.reduceMotion : false

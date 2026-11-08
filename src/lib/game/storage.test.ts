@@ -48,4 +48,45 @@ describe('storage', () => {
 		saveGame(save, storage);
 		expect(loadSave(1, storage).save.rngState).toBe(12345);
 	});
+
+	it('starts with thirty units of shelf space and a clean evening ledger', () => {
+		const save = createInitialSave(42);
+		expect(save.shelfCapacity).toBe(30);
+		expect(save.upgradeBoughtToday).toBe(false);
+		expect(save.rentOutcome).toBeNull();
+		expect(save.swappedToday).toBe(false);
+		expect(save.apprenticeUsedToday).toBe(false);
+		expect(save.warmStoveUsedToday).toBe(false);
+	});
+
+	it('backfills shelf capacity for an older save that owns the shelf upgrade', () => {
+		const legacy = { ...createInitialSave(42), upgrades: ['shelf'] } as Record<string, unknown>;
+		delete legacy.shelfCapacity;
+		delete legacy.upgradeBoughtToday;
+
+		const parsed = parseSave(JSON.stringify(legacy));
+		expect(parsed?.shelfCapacity).toBe(40);
+		expect(parsed?.upgradeBoughtToday).toBe(false);
+	});
+
+	it('round-trips the evening market and rent result', () => {
+		const storage = memoryStorage();
+		const save = {
+			...createInitialSave(42),
+			phase: 'market' as const,
+			market: [{ elementId: 'H', units: 2, price: 3 }],
+			rentOutcome: {
+				kind: 'paid' as const,
+				rent: 40,
+				coinsAfter: 60,
+				taken: null,
+				message: 'Rent paid.'
+			}
+		};
+		saveGame(save, storage);
+		const loaded = loadSave(1, storage).save;
+
+		expect(loaded.market).toEqual(save.market);
+		expect(loaded.rentOutcome).toEqual(save.rentOutcome);
+	});
 });

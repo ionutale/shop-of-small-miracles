@@ -61,6 +61,7 @@ describe('validateContent', () => {
 		expect(CONTENT.potions).toHaveLength(24);
 		expect(CONTENT.characters).toHaveLength(30);
 		expect(VISITS).toHaveLength(63);
+		expect(CONTENT.upgrades).toHaveLength(12);
 	});
 
 	it('rejects a potion with an unknown tag', () => {

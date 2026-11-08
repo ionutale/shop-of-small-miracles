@@ -90,6 +90,14 @@ export interface MarketOffer {
 	price: number;
 }
 
+export interface RentOutcome {
+	kind: 'paid' | 'shortfall';
+	rent: number;
+	coinsAfter: number;
+	taken: string | null;
+	message: string;
+}
+
 export interface DiscoveredPotion {
 	tags: Tag[];
 	name: string;
@@ -108,6 +116,8 @@ export interface BrewOutcome {
 	reputationDelta: number;
 	line: string;
 	potionName: string | null;
+	/** Set when the apprentice returns a mismatched brew's ingredients. */
+	refunded?: boolean;
 }
 
 export interface SaveState {
@@ -130,6 +140,12 @@ export interface SaveState {
 	quietDay: boolean;
 	market: MarketOffer[];
 	upgrades: string[];
+	shelfCapacity: number;
+	upgradeBoughtToday: boolean;
+	swappedToday: boolean;
+	apprenticeUsedToday: boolean;
+	warmStoveUsedToday: boolean;
+	rentOutcome: RentOutcome | null;
 	settings: { sound: boolean; reduceMotion: boolean };
 	introSeen: boolean;
 	lastResult: BrewOutcome | null;

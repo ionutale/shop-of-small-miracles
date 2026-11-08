@@ -3,16 +3,17 @@ import { CHAPTERS } from './chapters';
 import { CHARACTERS } from './characters';
 import { ELEMENTS } from './elements';
 import { POTIONS } from './potions';
+import { UPGRADES } from './upgrades';
 
 /**
  * The complete authored bundle used by the validator and the offline shop.
- * Upgrades and endings are filled in by the later economy and story slices.
+ * Endings are filled in by the later story slice.
  */
 export const CONTENT: ContentBundle = {
 	elements: ELEMENTS,
 	potions: POTIONS,
 	characters: CHARACTERS,
 	chapters: CHAPTERS,
-	upgrades: [],
+	upgrades: UPGRADES,
 	endings: []
 };

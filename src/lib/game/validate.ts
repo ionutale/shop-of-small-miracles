@@ -232,11 +232,18 @@ export function validateContent(
 	}
 
 	// Upgrades and endings are optional during the content-only slice.
+	const upgradeIds = new Set<string>();
 	for (const upgrade of upgrades) {
+		if (upgradeIds.has(upgrade.id)) errors.push(`duplicate upgrade id: ${upgrade.id}`);
+		upgradeIds.add(upgrade.id);
 		if (!upgrade.name.trim()) errors.push(`upgrade ${upgrade.id} has no name`);
 		if (!Number.isInteger(upgrade.cost) || upgrade.cost <= 0) {
 			errors.push(`upgrade ${upgrade.id} has no positive cost`);
 		}
+		if (!upgrade.effect.trim()) errors.push(`upgrade ${upgrade.id} has no effect`);
+	}
+	if (options.full && upgrades.length !== 12) {
+		errors.push(`expected 12 upgrades, found ${upgrades.length}`);
 	}
 	for (const ending of endings) {
 		if (!ending.title.trim()) errors.push(`ending ${ending.id} has no title`);

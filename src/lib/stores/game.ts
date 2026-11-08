@@ -3,9 +3,16 @@ import { VISITS_PER_DAY } from '../data/chapters';
 import { visitById } from '../data/characters';
 import { ELEMENTS } from '../data/elements';
 import { namePotion } from '../data/potions';
+import { ownedUpgrades } from '../data/upgrades';
 import type { BrewOutcome, SaveState } from '../types';
 import { brewTags, canBrew, consume, judgeBrew } from '../game/brew';
-import { endDay as endDayState, endService as endServiceState } from '../game/day';
+import { buyStock as buyStockState, buyUpgrade as buyUpgradeState } from '../game/economy';
+import {
+	continueAfterRent as continueAfterRentState,
+	endDay as endDayState,
+	endService as endServiceState,
+	payRent as payRentState
+} from '../game/day';
 import { pickVisit } from '../game/eligibility';
 import { createInitialSave, loadSave, saveGame, SAVE_KEY } from '../game/storage';
 
@@ -50,7 +57,35 @@ export function brew(ids: readonly string[]): void {
 	if (!visit || current.quietDay || current.lastResult) return;
 	if (!canBrew(current.stock, ids)) return;
 
-	const outcome = judgeBrew(brewTags(ids, ELEMENTS), visit, current.reputation, []);
+	let outcome: BrewOutcome = judgeBrew(
+		brewTags(ids, ELEMENTS),
+		visit,
+		current.reputation,
+		ownedUpgrades(current.upgrades)
+	);
+	let stock = consume(current.stock, ids);
+	let apprenticeUsedToday = current.apprenticeUsedToday;
+	let warmStoveUsedToday = current.warmStoveUsedToday;
+
+	if (
+		outcome.kind === 'decline' &&
+		current.upgrades.includes('apprentice') &&
+		!apprenticeUsedToday
+	) {
+		apprenticeUsedToday = true;
+		stock = current.stock.map((entry) => ({ ...entry }));
+		outcome = {
+			...outcome,
+			refunded: true,
+			line: `${outcome.line} Your apprentice quietly returns the ingredients to the shelf.`
+		};
+	}
+
+	if (outcome.kind === 'clean' && current.upgrades.includes('warm-stove') && !warmStoveUsedToday) {
+		warmStoveUsedToday = true;
+		outcome = { ...outcome, reputationDelta: outcome.reputationDelta + 1 };
+	}
+
 	const key = potionKey(outcome.tags);
 	const alreadyFiled = current.discovered.some((potion) => potionKey(potion.tags) === key);
 	const discovered =
@@ -67,12 +102,14 @@ export function brew(ids: readonly string[]): void {
 
 	game.set({
 		...current,
-		stock: consume(current.stock, ids),
+		stock,
 		coins: current.coins + outcome.pay,
 		reputation: clamp(current.reputation + outcome.reputationDelta, 0, 10),
 		discovered,
 		servedToday: current.servedToday + 1,
 		servedVisitIds: [...current.servedVisitIds, visit.id],
+		apprenticeUsedToday,
+		warmStoveUsedToday,
 		lastResult: outcome
 	});
 }
@@ -155,6 +192,68 @@ export function advanceDay(): void {
 	const current = get(game);
 	if (current.phase !== 'market') return;
 	game.set(endDayState(current));
+}
+
+/** Buys one unit from an evening-market stall. */
+export function buyMarketOffer(index: number): void {
+	const current = get(game);
+	if (current.phase !== 'market') return;
+	game.set(buyStockState(current, index));
+}
+
+/** At most one upgrade a night; an impossible tap leaves the ledger untouched. */
+export function purchaseUpgrade(upgradeId: string): void {
+	const current = get(game);
+	if (current.phase !== 'market') return;
+	try {
+		game.set(buyUpgradeState(current, upgradeId));
+	} catch {
+		// The button state and the engine agree; a stale tap is simply ignored.
+	}
+}
+
+/** The appointment ledger swaps the waiting visitor once a day. */
+export function swapCustomer(): void {
+	const current = get(game);
+	const visit = visitById(current.activeVisitId);
+	if (
+		current.phase !== 'service' ||
+		current.lastResult ||
+		current.swappedToday ||
+		!current.upgrades.includes('ledger') ||
+		!visit
+	) {
+		return;
+	}
+
+	const picked = pickVisit({
+		stock: current.stock,
+		chapter: current.chapter,
+		day: current.day,
+		servedVisitIds: [...current.servedVisitIds, visit.id],
+		rngState: current.rngState
+	});
+
+	if (!picked.visit) return;
+
+	game.set({
+		...current,
+		activeVisitId: picked.visit.id,
+		rngState: picked.rngState,
+		swappedToday: true
+	});
+}
+
+/** Pays or misses the rent; the outcome page stays until it is dismissed. */
+export function settleRent(): void {
+	const current = get(game);
+	if (current.rentOutcome) return;
+	game.set(payRentState(current));
+}
+
+/** Dismisses the paid-or-setback page and shows the next morning. */
+export function leaveRentScene(): void {
+	game.set(continueAfterRentState(get(game)));
 }
 
 export function resetGame(seed = 42): void {

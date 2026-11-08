@@ -80,9 +80,8 @@ export function judgeBrew(
 	result: BrewResult,
 	visit: VisitRecord,
 	reputation: number,
-	_upgrades: readonly UpgradeRecord[] = []
+	upgrades: readonly UpgradeRecord[] = []
 ): BrewOutcome {
-	void _upgrades;
 	const matched = visit.tags.filter((tag) => result.tags.includes(tag));
 	const extras = result.tags.filter((tag) => !visit.tags.includes(tag));
 
@@ -101,13 +100,18 @@ export function judgeBrew(
 	}
 
 	const kind = extras.length === 0 ? 'clean' : 'sideEffect';
+	const owned = new Set(upgrades.map((upgrade) => upgrade.id));
+	let pay = payFor(kind, matched.length, result.potency, extras.length, reputation);
+	if (kind === 'clean' && owned.has('brass-scales')) pay += 2;
+	if (owned.has('old-sign')) pay = Math.round(pay * 1.1);
+
 	return {
 		kind,
 		tags: result.tags,
 		potency: result.potency,
 		matched,
 		extras,
-		pay: payFor(kind, matched.length, result.potency, extras.length, reputation),
+		pay: Math.max(5, pay),
 		reputationDelta: kind === 'clean' ? 1 : -1,
 		line: kind === 'clean' ? visit.cleanLine : visit.sideEffectLine,
 		potionName: namePotion(result.tags)

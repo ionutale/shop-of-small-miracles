@@ -10,6 +10,7 @@ const summary = [
 	`${CONTENT.potions.length} named potions`,
 	`${CONTENT.characters.length} characters`,
 	`${visits} visits`,
+	`${CONTENT.upgrades.length} upgrades`,
 	`${CHAPTERS.length} chapters`,
 	`${TOTAL_DAYS} days`,
 	`${VISITS_PER_DAY} visitors a day`
