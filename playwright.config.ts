@@ -10,7 +10,9 @@ export default defineConfig({
 		hasTouch: true
 	},
 	webServer: {
-		command: 'pnpm build && pnpm preview --host 127.0.0.1 --port 4320',
+		// exec keeps the preview server as the direct child so Playwright can stop it
+		// cleanly at the end of the run instead of leaving it holding the port.
+		command: 'pnpm build && exec ./node_modules/.bin/vite preview --host 127.0.0.1 --port 4320',
 		url: 'http://127.0.0.1:4320',
 		reuseExistingServer: false,
 		timeout: 180_000
