@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { beatForDay, chapterForDay, VISITS_PER_DAY } from '../data/chapters';
 	import { characterById, visitById } from '../data/characters';
 	import { ELEMENTS } from '../data/elements';
 	import { brewTags, judgeBrew } from '../game/brew';
-	import { brew, decline, game, nextCustomer } from '../stores/game';
+	import { brew, decline, finishService, game, nextCustomer } from '../stores/game';
 	import BrewPreview from './BrewPreview.svelte';
 	import Cauldron from './Cauldron.svelte';
 	import CustomerCard from './CustomerCard.svelte';
+	import EveningPlaceholder from './EveningPlaceholder.svelte';
 	import IngredientShelf from './IngredientShelf.svelte';
 
 	let slots = $state<string[]>([]);
@@ -13,6 +15,9 @@
 	const visit = $derived(visitById($game.activeVisitId));
 	const character = $derived(visit ? characterById(visit.characterId) : null);
 	const result = $derived($game.lastResult);
+	const chapter = $derived(chapterForDay($game.day));
+	const beat = $derived(beatForDay($game.day));
+	const visitorNumber = $derived(Math.min($game.servedToday + (result ? 0 : 1), VISITS_PER_DAY));
 	const shelf = $derived(
 		ELEMENTS.map((element) => ({
 			element,
@@ -50,6 +55,11 @@
 		nextCustomer();
 		slots = [];
 	}
+
+	function handleEvening(): void {
+		finishService();
+		slots = [];
+	}
 </script>
 
 <div class="shop" data-phase={$game.phase}>
@@ -64,6 +74,11 @@
 			<h1>A Shop of Small Miracles</h1>
 			<div class="status" aria-label="Shop status">
 				<p class="stat"><span>Day</span> <strong>{$game.day}</strong></p>
+				<p class="stat"><span>Chapter</span> <strong>{chapter.number}</strong></p>
+				<p class="stat">
+					<span>Visitors</span>
+					<strong data-testid="visitor-count">{visitorNumber} of {VISITS_PER_DAY}</strong>
+				</p>
 				<p class="stat"><span>Coins</span> <strong>{$game.coins} coins</strong></p>
 				<p class="stat">
 					<span>Reputation</span> <strong>{$game.reputation} / 10</strong>
@@ -71,58 +86,79 @@
 			</div>
 		</header>
 
-		<section class="service" aria-label="Today’s service">
-			{#if visit && character}
-				<CustomerCard {visit} {character} onDecline={result ? undefined : handleDecline} />
-
-				{#if result}
-					<section class="result paper" role="status" aria-live="polite">
-						<p class="hand verdict">
-							{result.kind === 'clean'
-								? 'A clean miracle'
-								: result.kind === 'sideEffect'
-									? 'A muddy miracle'
-									: 'A gentle no'}
-						</p>
-						<p class="line">{result.line}</p>
-
-						{#if result.pay > 0}
-							<p class="payment">Payment: {result.pay} coins</p>
-						{/if}
-						{#if result.reputationDelta > 0}
-							<p class="reputation">Reputation +1.</p>
-						{:else if result.reputationDelta < 0}
-							<p class="reputation">Reputation −1.</p>
-						{:else if result.tags.length === 0}
-							<p class="reputation muted">Nothing was consumed.</p>
-						{:else}
-							<p class="reputation muted">The ingredients were spent.</p>
-						{/if}
-
-						{#if result.potionName}
-							<p class="filed">
-								Filed in the recipe book: <span class="hand">{result.potionName}</span>
-							</p>
-						{/if}
-
-						<button class="next" type="button" onclick={handleNext}>Next visitor</button>
-					</section>
-				{:else}
-					<Cauldron {slots} onRemove={remove} />
-					<IngredientShelf entries={shelf} disabled={slots.length >= 3} onPick={pick} />
-					<BrewPreview {preview} enabled={canBrewNow} onBrew={handleBrew} />
-				{/if}
-			{:else}
-				<section class="quiet paper" aria-labelledby="quiet-title">
-					<p class="hand quiet-kicker">the kettle, the dust, the last of the light</p>
-					<h2 id="quiet-title">The shop is quiet</h2>
-					<p>
-						No one else comes today. You bank the fire, wipe the counter, and let the room settle
-						around you.
-					</p>
-				</section>
-			{/if}
+		<section class="beat paper" data-testid="day-beat" aria-label="Today’s story">
+			<p class="hand beat-kicker">{chapter.title}</p>
+			<p>{beat}</p>
 		</section>
+
+		{#if $game.phase === 'market'}
+			<EveningPlaceholder />
+		{:else if $game.phase === 'chapterEnd'}
+			<section class="interlude paper" data-testid="interlude" aria-labelledby="interlude-title">
+				<p class="hand quiet-kicker">the last of the candle</p>
+				<h2 id="interlude-title">The last day is done</h2>
+				<p>
+					The shop is still here. The ending is being written, page by page, by the choices you have
+					already made.
+				</p>
+			</section>
+		{:else}
+			<section class="service" aria-label="Today’s service">
+				{#if visit && character}
+					<CustomerCard {visit} {character} onDecline={result ? undefined : handleDecline} />
+
+					{#if result}
+						<section class="result paper" role="status" aria-live="polite">
+							<p class="hand verdict">
+								{result.kind === 'clean'
+									? 'A clean miracle'
+									: result.kind === 'sideEffect'
+										? 'A muddy miracle'
+										: 'A gentle no'}
+							</p>
+							<p class="line">{result.line}</p>
+
+							{#if result.pay > 0}
+								<p class="payment">Payment: {result.pay} coins</p>
+							{/if}
+							{#if result.reputationDelta > 0}
+								<p class="reputation">Reputation +1.</p>
+							{:else if result.reputationDelta < 0}
+								<p class="reputation">Reputation −1.</p>
+							{:else if result.tags.length === 0}
+								<p class="reputation muted">Nothing was consumed.</p>
+							{:else}
+								<p class="reputation muted">The ingredients were spent.</p>
+							{/if}
+
+							{#if result.potionName}
+								<p class="filed">
+									Filed in the recipe book: <span class="hand">{result.potionName}</span>
+								</p>
+							{/if}
+
+							<button class="next" type="button" onclick={handleNext}>
+								{$game.servedToday >= VISITS_PER_DAY ? 'Evening' : 'Next visitor'}
+							</button>
+						</section>
+					{:else}
+						<Cauldron {slots} onRemove={remove} />
+						<IngredientShelf entries={shelf} disabled={slots.length >= 3} onPick={pick} />
+						<BrewPreview {preview} enabled={canBrewNow} onBrew={handleBrew} />
+					{/if}
+				{:else}
+					<section class="quiet paper" aria-labelledby="quiet-title">
+						<p class="hand quiet-kicker">the kettle, the dust, the last of the light</p>
+						<h2 id="quiet-title">The shop is quiet</h2>
+						<p>
+							No one else comes today. You bank the fire, wipe the counter, and let the room settle
+							around you.
+						</p>
+						<button class="next" type="button" onclick={handleEvening}>Evening</button>
+					</section>
+				{/if}
+			</section>
+		{/if}
 	</main>
 </div>
 
@@ -217,6 +253,28 @@
 		color: var(--brass);
 		font-size: 1.2rem;
 		line-height: 1.1;
+	}
+
+	.beat {
+		margin: 0 0 0.85rem;
+		padding: 0.65rem 0.85rem;
+		border-left: 2px solid rgba(176, 138, 79, 0.55);
+		border-radius: 0 8px 8px 0;
+		background: rgba(255, 255, 255, 0.16);
+	}
+
+	.beat-kicker {
+		margin: 0 0 0.1rem;
+		color: var(--brass);
+		font-size: 1.15rem;
+		line-height: 1.1;
+	}
+
+	.beat p:last-child {
+		margin: 0;
+		font-size: 0.98rem;
+		line-height: 1.4;
+		color: var(--ink-soft);
 	}
 
 	h1 {
@@ -315,6 +373,24 @@
 		padding: 1.2rem 1.1rem;
 		border-radius: 6px 16px 7px 14px;
 		border: 1px solid rgba(59, 42, 26, 0.2);
+	}
+
+	.interlude {
+		margin-top: 0.9rem;
+		padding: 1.2rem 1.1rem;
+		border-radius: 6px 16px 7px 14px;
+		border: 1px solid rgba(59, 42, 26, 0.2);
+	}
+
+	.interlude h2 {
+		margin: 0 0 0.45rem;
+		font-size: 1.6rem;
+	}
+
+	.interlude p:last-child {
+		margin: 0;
+		color: var(--ink-soft);
+		line-height: 1.45;
 	}
 
 	.quiet-kicker {

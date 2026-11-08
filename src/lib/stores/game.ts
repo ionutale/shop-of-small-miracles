@@ -1,11 +1,12 @@
 import { get, writable } from 'svelte/store';
-import { VISITS, visitById } from '../data/characters';
+import { VISITS_PER_DAY } from '../data/chapters';
+import { visitById } from '../data/characters';
 import { ELEMENTS } from '../data/elements';
 import { namePotion } from '../data/potions';
 import type { BrewOutcome, SaveState } from '../types';
 import { brewTags, canBrew, consume, judgeBrew } from '../game/brew';
-import { eligibleVisits } from '../game/eligibility';
-import { pickIndex } from '../game/rng';
+import { endDay as endDayState, endService as endServiceState } from '../game/day';
+import { pickVisit } from '../game/eligibility';
 import { createInitialSave, loadSave, saveGame, SAVE_KEY } from '../game/storage';
 
 export { SAVE_KEY };
@@ -102,34 +103,58 @@ export function decline(): void {
 	});
 }
 
-/** Clears the result and presents the next solvable visitor, or a quiet day. */
+/** Clears the result and presents the next solvable visitor, or the evening. */
 export function nextCustomer(): void {
 	const current = get(game);
 	if (!current.lastResult) return;
 
-	const candidates = eligibleVisits(current.stock, VISITS, ELEMENTS, current.servedVisitIds);
-	if (candidates.length === 0) {
+	if (current.servedToday >= VISITS_PER_DAY) {
+		game.set(endServiceState(current));
+		return;
+	}
+
+	const picked = pickVisit({
+		stock: current.stock,
+		chapter: current.chapter,
+		day: current.day,
+		servedVisitIds: current.servedVisitIds,
+		rngState: current.rngState
+	});
+
+	if (!picked.visit) {
 		game.set({
 			...current,
 			activeVisitId: null,
 			quietDay: true,
 			lastResult: null,
+			rngState: picked.rngState,
 			phase: 'service'
 		});
 		return;
 	}
 
-	const step = pickIndex(current.rngState, candidates.length);
-	const visit = candidates[step.index];
-
 	game.set({
 		...current,
-		activeVisitId: visit.id,
+		activeVisitId: picked.visit.id,
 		quietDay: false,
 		lastResult: null,
-		rngState: step.state,
+		rngState: picked.rngState,
 		phase: 'service'
 	});
+}
+
+/** Closes service early: a quiet day still goes on to the evening. */
+export function finishService(): void {
+	const current = get(game);
+	if (current.phase !== 'service') return;
+	game.set(endServiceState(current));
+}
+
+/** Closes the shop and opens the next service day. */
+export function advanceDay(): void {
+	const current = get(game);
+	if (current.phase !== 'market') return;
+	game.set(endDayState(current));
 }
 
 export function resetGame(seed = 42): void {

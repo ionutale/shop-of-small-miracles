@@ -1,18 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { memoryStorage } from '../test/fixtures';
+import { dayRngState } from './rng';
 import { createInitialSave, loadSave, parseSave, saveGame, SAVE_KEY } from './storage';
 
 describe('storage', () => {
-	it('creates a day-one shop with six ingredients and a visitor waiting', () => {
+	it('creates a day-one shop with a stocked shelf and the fixed first visitor waiting', () => {
 		const save = createInitialSave(42);
 		expect(save.version).toBe(1);
 		expect(save.day).toBe(1);
 		expect(save.phase).toBe('service');
 		expect(save.coins).toBe(40);
 		expect(save.reputation).toBe(5);
-		expect(save.stock).toHaveLength(6);
+		expect(save.stock).toHaveLength(10);
+		expect(save.servedToday).toBe(0);
 		expect(save.activeVisitId).toBe('widow-lamp');
 		expect(save.quietDay).toBe(false);
+		expect(save.rngState).toBe(dayRngState(42, 1));
 	});
 
 	it('round-trips through storage', () => {

@@ -1,7 +1,5 @@
-import { VISITS } from '../data/characters';
-import { ELEMENTS } from '../data/elements';
 import type { BrewOutcome, Phase, SaveState } from '../types';
-import { eligibleVisits } from './eligibility';
+import { beginServiceDay } from './day';
 
 export const SAVE_KEY = 'small-miracles:save:v1';
 
@@ -9,11 +7,15 @@ const PHASES: readonly Phase[] = ['morning', 'service', 'market', 'chapterEnd', 
 
 const STARTING_STOCK = [
 	{ elementId: 'H', units: 3 },
-	{ elementId: 'O', units: 2 },
+	{ elementId: 'O', units: 3 },
 	{ elementId: 'Na', units: 3 },
 	{ elementId: 'Cu', units: 3 },
 	{ elementId: 'K', units: 2 },
-	{ elementId: 'Ag', units: 2 }
+	{ elementId: 'Ag', units: 3 },
+	{ elementId: 'Cl', units: 3 },
+	{ elementId: 'C', units: 2 },
+	{ elementId: 'F', units: 3 },
+	{ elementId: 'Fe', units: 2 }
 ];
 
 function defaultStorage(): Storage | null {
@@ -25,10 +27,7 @@ function defaultStorage(): Storage | null {
 }
 
 export function createInitialSave(seed = 42): SaveState {
-	const stock = STARTING_STOCK.map((entry) => ({ ...entry }));
-	const firstVisit = eligibleVisits(stock, VISITS, ELEMENTS)[0] ?? null;
-
-	return {
+	const base: SaveState = {
 		version: 1,
 		seed,
 		rngState: seed >>> 0,
@@ -38,20 +37,22 @@ export function createInitialSave(seed = 42): SaveState {
 		coins: 40,
 		reputation: 5,
 		setbacks: 0,
-		stock,
+		stock: STARTING_STOCK.map((entry) => ({ ...entry })),
 		discovered: [],
 		flags: [],
 		relationships: { widow: 0, merchant: 0, apprentice: 0 },
 		servedToday: 0,
 		servedVisitIds: [],
-		activeVisitId: firstVisit?.id ?? null,
-		quietDay: !firstVisit,
+		activeVisitId: null,
+		quietDay: false,
 		market: [],
 		upgrades: [],
 		settings: { sound: true, reduceMotion: false },
 		introSeen: true,
 		lastResult: null
 	};
+
+	return beginServiceDay(base, 1);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

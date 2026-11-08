@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	CHAPTERS,
-	TOTAL_DAYS,
-	beatForDay,
-	chapterNumberForDay,
-	rentDueOn
-} from './chapters';
+import { CHAPTERS, TOTAL_DAYS, beatForDay, chapterNumberForDay, rentDueOn } from './chapters';
 import { CHARACTERS, VISITS } from './characters';
 import { ELEMENTS } from './elements';
 import { POTIONS } from './potions';
@@ -87,6 +81,12 @@ describe('characters and visits', () => {
 			for (const visit of character.visits) expect(visit.characterId).toBe(character.id);
 		}
 	});
+
+	it('stocks exactly twenty-one visits in each chapter', () => {
+		for (const chapter of [1, 2, 3]) {
+			expect(VISITS.filter((visit) => visit.chapter === chapter)).toHaveLength(21);
+		}
+	});
 });
 
 describe('the twenty-one day manifest', () => {
@@ -116,7 +116,17 @@ describe('the twenty-one day manifest', () => {
 			chapter.recurring.map((recurring) => ({ ...recurring, chapter: chapter.number }))
 		);
 		expect(arcs.map((arc) => arc.characterId).sort()).toEqual(
-			['apprentice', 'apprentice', 'apprentice', 'merchant', 'merchant', 'merchant', 'widow', 'widow', 'widow'].sort()
+			[
+				'apprentice',
+				'apprentice',
+				'apprentice',
+				'merchant',
+				'merchant',
+				'merchant',
+				'widow',
+				'widow',
+				'widow'
+			].sort()
 		);
 		for (const arc of arcs) {
 			expect(arc.days).toHaveLength(1);

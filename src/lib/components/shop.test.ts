@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { get } from 'svelte/store';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { serviceSave } from '../test/fixtures';
+import { createInitialSave } from '../game/storage';
 import { game, initGame } from '../stores/game';
 import ShopScreen from './ShopScreen.svelte';
 
@@ -16,12 +17,14 @@ afterEach(() => {
 });
 
 describe('shop', () => {
-	it('shows the shop sign, one customer, and two requested essences', () => {
+	it('shows the shop sign, one customer, two requested essences, and today’s story beat', () => {
 		render(ShopScreen);
 		expect(screen.getByRole('heading', { name: /a shop of small miracles/i })).toBeInTheDocument();
-		expect(screen.getByText(/the widow/i)).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: /the widow/i })).toBeInTheDocument();
 		expect(screen.getByTestId('customer-request')).toHaveTextContent(/warm/i);
 		expect(screen.getAllByTestId('tag-chip')).toHaveLength(2);
+		expect(screen.getByTestId('day-beat')).toHaveTextContent(/letter arrives under the door/i);
+		expect(screen.getByTestId('visitor-count')).toHaveTextContent('1 of 3');
 	});
 
 	it('selects three ingredients, previews the tags, and brews a clean potion', async () => {
@@ -109,5 +112,44 @@ describe('shop', () => {
 		render(ShopScreen);
 		expect(screen.getByText(/the shop is quiet/i)).toBeInTheDocument();
 		expect(screen.queryByRole('button', { name: /^brew$/i })).not.toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /^evening$/i })).toBeInTheDocument();
+	});
+
+	it('serves exactly three visitors with no repeat, then shows the evening placeholder', async () => {
+		const user = userEvent.setup();
+		localStorage.clear();
+		initGame(42, createInitialSave(42));
+		render(ShopScreen);
+
+		const met: string[] = [];
+		for (let served = 0; served < 3; served++) {
+			expect(screen.getByTestId('visitor-count')).toHaveTextContent(`${served + 1} of 3`);
+			met.push(get(game).activeVisitId ?? '');
+			await user.click(screen.getByRole('button', { name: /politely decline/i }));
+			const next = screen.getByRole('button', {
+				name: served === 2 ? /^evening$/i : /next visitor/i
+			});
+			await user.click(next);
+		}
+
+		expect(new Set(met).size).toBe(3);
+		expect(get(game).phase).toBe('market');
+		expect(screen.getByTestId('evening')).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: /^evening$/i })).toBeInTheDocument();
+	});
+
+	it('lets a quiet day reach the evening and open the next day', async () => {
+		const user = userEvent.setup();
+		initGame(42, serviceSave({ stock: [], quietDay: true, activeVisitId: null }));
+		render(ShopScreen);
+
+		await user.click(screen.getByRole('button', { name: /^evening$/i }));
+		expect(screen.getByTestId('evening')).toBeInTheDocument();
+
+		await user.click(screen.getByRole('button', { name: /close up the shop/i }));
+		const state = get(game);
+		expect(state.day).toBe(2);
+		expect(state.phase).toBe('service');
+		expect(screen.getByTestId('day-beat')).toHaveTextContent(/swept your step/i);
 	});
 });
