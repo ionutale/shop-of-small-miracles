@@ -1,11 +1,86 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Journal from '../lib/components/Journal.svelte';
+	import RecipeBook from '../lib/components/RecipeBook.svelte';
 	import ShopScreen from '../lib/components/ShopScreen.svelte';
 	import { initGame } from '../lib/stores/game';
+
+	type Tab = 'shop' | 'book' | 'journal';
+
+	const TABS: readonly { id: Tab; label: string }[] = [
+		{ id: 'shop', label: 'Shop' },
+		{ id: 'book', label: 'Recipe book' },
+		{ id: 'journal', label: 'Journal' }
+	];
+
+	let tab = $state<Tab>('shop');
 
 	onMount(() => {
 		initGame();
 	});
 </script>
 
-<ShopScreen />
+{#if tab === 'shop'}
+	<ShopScreen />
+{:else if tab === 'book'}
+	<RecipeBook />
+{:else}
+	<Journal />
+{/if}
+
+<nav class="tabs" aria-label="Shop pages">
+	{#each TABS as item (item.id)}
+		<button
+			type="button"
+			class:active={tab === item.id}
+			aria-current={tab === item.id ? 'page' : undefined}
+			onclick={() => (tab = item.id)}
+		>
+			{item.label}
+		</button>
+	{/each}
+</nav>
+
+<style>
+	.tabs {
+		position: fixed;
+		z-index: 20;
+		bottom: 0;
+		left: 50%;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		width: min(100%, 760px);
+		padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom));
+		border-top: 1px solid rgba(59, 42, 26, 0.28);
+		background: rgba(226, 206, 166, 0.96);
+		box-shadow: 0 -10px 26px rgba(36, 26, 18, 0.22);
+		transform: translateX(-50%);
+		backdrop-filter: blur(6px);
+	}
+
+	.tabs button {
+		min-height: 48px;
+		padding: 0.4rem 0.5rem;
+		border: 0;
+		border-radius: 4px 10px 4px 10px;
+		background: transparent;
+		color: var(--ink-soft);
+		font-family: 'Caveat', cursive;
+		font-size: 1.15rem;
+		letter-spacing: 0.02em;
+	}
+
+	.tabs button.active {
+		background: rgba(255, 255, 255, 0.42);
+		color: var(--burgundy);
+		box-shadow: inset 0 0 0 1px rgba(110, 47, 58, 0.28);
+	}
+
+	@media (min-width: 620px) {
+		.tabs {
+			bottom: 1rem;
+			border: 1px solid rgba(59, 42, 26, 0.28);
+			border-radius: 8px 18px 8px 14px;
+		}
+	}
+</style>

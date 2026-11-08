@@ -49,6 +49,18 @@ describe('game store', () => {
 		expect(after.servedVisitIds).toContain('widow-lamp');
 	});
 
+	it('files an identical tag set only once', () => {
+		initGame(
+			42,
+			serviceSave({ discovered: [{ tags: ['Light', 'Warm'], name: "Widow's Lamp", day: 1 }] })
+		);
+
+		brew(['H', 'Na', 'Cu']);
+
+		expect(get(game).discovered).toHaveLength(1);
+		expect(get(game).discovered[0].day).toBe(1);
+	});
+
 	it('allows only one brew per customer', () => {
 		brew(['H', 'Na', 'Cu']);
 		const once = get(game);

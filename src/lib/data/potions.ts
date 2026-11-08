@@ -156,16 +156,21 @@ const KEY = (tags: readonly Tag[]) => [...tags].sort().join('+');
 
 const POTION_BY_TAGS = new Map(POTIONS.map((potion) => [KEY(potion.tags), potion]));
 
+/** The named potion for a pair of distinct tags, or null for an unknown pair. */
+export function namedPotionFor(tags: readonly Tag[]): PotionRecord | null {
+	const distinct = [...new Set(tags)];
+	if (distinct.length !== 2) return null;
+	return POTION_BY_TAGS.get(KEY(distinct)) ?? null;
+}
+
 /**
  * Named potions win; anything else gets the shop's descriptive, lower-case name.
  * The recipe book records both, but only named potions appear in the story ledger.
  */
 export function namePotion(tags: readonly Tag[]): string {
+	const named = namedPotionFor(tags);
+	if (named) return named.name;
 	const distinct = [...new Set(tags)];
-	if (distinct.length === 2) {
-		const named = POTION_BY_TAGS.get(KEY(distinct));
-		if (named) return named.name;
-	}
 	const words = distinct.map((tag) => tag.toLowerCase()).join(', ');
 	return `a ${words} draught`;
 }

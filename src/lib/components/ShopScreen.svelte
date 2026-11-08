@@ -208,7 +208,7 @@
 		min-height: 100dvh;
 		max-width: 760px;
 		margin: 0 auto;
-		padding: calc(2.7rem + env(safe-area-inset-top)) 1rem calc(2rem + env(safe-area-inset-bottom));
+		padding: calc(2.7rem + env(safe-area-inset-top)) 1rem calc(5.5rem + env(safe-area-inset-bottom));
 		overflow: hidden;
 		background:
 			linear-gradient(115deg, rgba(255, 255, 255, 0.26), transparent 40%),
@@ -468,7 +468,7 @@
 		.shop {
 			margin: 1.25rem auto;
 			min-height: calc(100dvh - 2.5rem);
-			padding: 3rem 2.2rem 2.4rem;
+			padding: 3rem 2.2rem 3.2rem;
 			border-radius: 4px 22px 6px 18px;
 			border: 1px solid rgba(59, 42, 26, 0.25);
 		}
