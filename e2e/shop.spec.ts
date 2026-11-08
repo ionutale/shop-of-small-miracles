@@ -82,7 +82,9 @@ test('serves the first customer by tap in under a minute and restores the shop a
 	await expect(page.getByRole('status')).toContainText(/it does not burn/i);
 	await expect(page.getByText(/payment: 24 coins/i)).toBeVisible();
 	await expect(page.getByText(/6 \/ 10/)).toBeVisible();
-	await expect(page.getByText(/widow's lamp/i)).toBeVisible();
+	await expect(
+		page.getByRole('region', { name: /today’s service/i }).getByText(/widow's lamp/i)
+	).toBeVisible();
 
 	await page.reload();
 	await expect(page.locator('.shop')).toHaveAttribute('data-phase', 'service');
@@ -270,7 +272,7 @@ test('pays the rent on day seven and opens chapter two', async ({ page }) => {
 	await page.getByRole('button', { name: /continue/i }).click();
 	await expect(page.locator('.shop')).toHaveAttribute('data-phase', 'service');
 	await expect(page.getByTestId('day-beat')).toContainText(/widow comes back/i);
-	await expect(page.getByText(/chapter 2/i)).toBeVisible();
+	await expect(page.getByLabel('Shop status').getByText(/chapter 2/i)).toBeVisible();
 });
 
 test('a rent shortfall names what was taken and the shop continues', async ({ page }) => {

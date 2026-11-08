@@ -15,18 +15,26 @@
 
 	let tab = $state<Tab>('shop');
 
+	function openTab(next: Tab): void {
+		if (next === tab) return;
+		tab = next;
+		window.scrollTo({ top: 0 });
+	}
+
 	onMount(() => {
 		initGame();
 	});
 </script>
 
-{#if tab === 'shop'}
+<div hidden={tab !== 'shop'}>
 	<ShopScreen />
-{:else if tab === 'book'}
+</div>
+<div hidden={tab !== 'book'}>
 	<RecipeBook />
-{:else}
+</div>
+<div hidden={tab !== 'journal'}>
 	<Journal />
-{/if}
+</div>
 
 <nav class="tabs" aria-label="Shop pages">
 	{#each TABS as item (item.id)}
@@ -34,7 +42,7 @@
 			type="button"
 			class:active={tab === item.id}
 			aria-current={tab === item.id ? 'page' : undefined}
-			onclick={() => (tab = item.id)}
+			onclick={() => openTab(item.id)}
 		>
 			{item.label}
 		</button>
