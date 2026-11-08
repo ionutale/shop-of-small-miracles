@@ -149,6 +149,10 @@ export interface SaveState {
 	settings: { sound: boolean; reduceMotion: boolean };
 	introSeen: boolean;
 	lastResult: BrewOutcome | null;
+	/** The day whose morning scene has been opened or dismissed. */
+	morningSeenDay: number;
+	/** Authored story options already taken, in order. */
+	choices: string[];
 }
 
 export interface ContentBundle {

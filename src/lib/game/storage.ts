@@ -56,7 +56,9 @@ export function createInitialSave(seed = 42): SaveState {
 		rentOutcome: null,
 		settings: { sound: true, reduceMotion: false },
 		introSeen: true,
-		lastResult: null
+		lastResult: null,
+		morningSeenDay: 0,
+		choices: []
 	};
 
 	return beginServiceDay(base, 1);
@@ -145,7 +147,18 @@ export function parseSave(raw: string | null): SaveState | null {
 			sound: typeof settings.sound === 'boolean' ? settings.sound : true,
 			reduceMotion: typeof settings.reduceMotion === 'boolean' ? settings.reduceMotion : false
 		},
-		lastResult: isBrewOutcome(value.lastResult) ? value.lastResult : null
+		lastResult: isBrewOutcome(value.lastResult) ? value.lastResult : null,
+		morningSeenDay:
+			Number.isInteger(value.morningSeenDay) &&
+			(value.morningSeenDay as number) >= 0 &&
+			(value.morningSeenDay as number) <= 21
+				? (value.morningSeenDay as number)
+				: 0,
+		choices: Array.isArray(value.choices)
+			? (value.choices as unknown[]).filter(
+					(choice): choice is string => typeof choice === 'string'
+				)
+			: []
 	};
 }
 

@@ -14,6 +14,7 @@ import {
 	payRent as payRentState
 } from '../game/day';
 import { pickVisit } from '../game/eligibility';
+import { applyChoice } from '../game/story';
 import { createInitialSave, loadSave, saveGame, SAVE_KEY } from '../game/storage';
 
 export { SAVE_KEY };
@@ -251,9 +252,24 @@ export function settleRent(): void {
 	game.set(payRentState(current));
 }
 
-/** Dismisses the paid-or-setback page and shows the next morning. */
+/** Dismisses the paid-or-setback page and shows the next morning or ending. */
 export function leaveRentScene(): void {
 	game.set(continueAfterRentState(get(game)));
+}
+
+/** Takes an authored morning option and closes that morning's card. */
+export function chooseStoryOption(optionId: string): void {
+	const current = get(game);
+	const next = applyChoice(current, optionId);
+	if (next === current) return;
+	game.set({ ...next, morningSeenDay: current.day });
+}
+
+/** Opens the day without taking a choice, when the day has no authored one. */
+export function dismissMorning(): void {
+	const current = get(game);
+	if (current.morningSeenDay >= current.day) return;
+	game.set({ ...current, morningSeenDay: current.day });
 }
 
 export function resetGame(seed = 42): void {

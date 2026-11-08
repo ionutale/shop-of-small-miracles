@@ -151,8 +151,15 @@ export function payRent(save: SaveState): SaveState {
 	return beginServiceDay(carried, nextDay);
 }
 
-/** Dismisses the paid-or-setback page and reveals the already-open next day. */
+/**
+ * Dismisses the paid-or-setback page. The final ledger opens the ending; every
+ * other night is already showing the next service day behind the page.
+ */
 export function continueAfterRent(save: SaveState): SaveState {
 	if (!save.rentOutcome) return save;
-	return { ...save, rentOutcome: null };
+	const cleared: SaveState = { ...save, rentOutcome: null };
+	if (cleared.day >= TOTAL_DAYS && cleared.flags.includes('ledgerClosed')) {
+		return { ...cleared, phase: 'ending' };
+	}
+	return cleared;
 }

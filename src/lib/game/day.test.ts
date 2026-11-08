@@ -133,7 +133,7 @@ describe('rent', () => {
 		expect(short.phase).not.toBe('ending');
 	});
 
-	it('closes the final ledger on day 21 without an ending or a game over', () => {
+	it('closes the final ledger on day 21 and opens the ending', () => {
 		const final = payRent(
 			saveFixture({ day: 21, chapter: 3, phase: 'chapterEnd', coins: 200, reputation: 5 })
 		);
@@ -143,11 +143,10 @@ describe('rent', () => {
 		expect(final.phase).toBe('chapterEnd');
 		expect(final.flags).toContain('ledgerClosed');
 		expect(final.rentOutcome?.kind).toBe('paid');
-		expect(final.phase).not.toBe('ending');
 
 		const closed = continueAfterRent(final);
 		expect(closed.rentOutcome).toBeNull();
-		expect(closed.phase).toBe('chapterEnd');
+		expect(closed.phase).toBe('ending');
 	});
 
 	it('clears the rent result once the player continues', () => {

@@ -69,6 +69,16 @@ describe('storage', () => {
 		expect(parsed?.upgradeBoughtToday).toBe(false);
 	});
 
+	it('backfills the morning and story fields for an older save', () => {
+		const legacy = { ...createInitialSave(42) } as Record<string, unknown>;
+		delete legacy.morningSeenDay;
+		delete legacy.choices;
+
+		const parsed = parseSave(JSON.stringify(legacy));
+		expect(parsed?.morningSeenDay).toBe(0);
+		expect(parsed?.choices).toEqual([]);
+	});
+
 	it('round-trips the evening market and rent result', () => {
 		const storage = memoryStorage();
 		const save = {

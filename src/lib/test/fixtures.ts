@@ -50,6 +50,8 @@ export function saveFixture(overrides: Partial<SaveState> = {}): SaveState {
 		settings: { sound: true, reduceMotion: false },
 		introSeen: true,
 		lastResult: null,
+		morningSeenDay: 0,
+		choices: [],
 		...overrides
 	};
 }
