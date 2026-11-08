@@ -4,6 +4,7 @@
 
 	let {
 		preview,
+		potionName = null,
 		enabled,
 		onBrew
 	}: {
@@ -14,6 +15,7 @@
 			pay: number;
 			extras: Tag[];
 		} | null;
+		potionName?: string | null;
 		enabled: boolean;
 		onBrew: () => void;
 	} = $props();
@@ -37,6 +39,10 @@
 
 		{#if preview.extras.length > 0}
 			<p class="extra">Extra essences: {preview.extras.join(', ')}. The miracle will be muddy.</p>
+		{/if}
+
+		{#if potionName}
+			<p class="named">The cauldron names it: <span class="hand">{potionName}</span></p>
 		{/if}
 
 		{#if preview.kind === 'decline'}
@@ -93,6 +99,17 @@
 	.extra {
 		margin: 0 0 0.35rem;
 		font-size: 0.86rem;
+		color: var(--burgundy);
+	}
+
+	.named {
+		margin: 0 0 0.35rem;
+		font-size: 0.9rem;
+		color: var(--ink-soft);
+	}
+
+	.named .hand {
+		font-size: 1.12rem;
 		color: var(--burgundy);
 	}
 

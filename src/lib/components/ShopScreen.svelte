@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { beatForDay, chapterForDay, VISITS_PER_DAY } from '../data/chapters';
+	import { beatForDay, chapterForDay, rentDueOn, VISITS_PER_DAY } from '../data/chapters';
 	import { characterById, visitById } from '../data/characters';
 	import { ELEMENTS } from '../data/elements';
+	import { namePotion } from '../data/potions';
 	import { brewTags, judgeBrew } from '../game/brew';
-	import { brew, decline, finishService, game, nextCustomer } from '../stores/game';
+	import { brew, decline, finishService, game, nextCustomer, swapCustomer } from '../stores/game';
 	import BrewPreview from './BrewPreview.svelte';
 	import Cauldron from './Cauldron.svelte';
 	import CustomerCard from './CustomerCard.svelte';
-	import EveningPlaceholder from './EveningPlaceholder.svelte';
 	import IngredientShelf from './IngredientShelf.svelte';
+	import MarketScreen from './MarketScreen.svelte';
+	import RentScene from './RentScene.svelte';
 
 	let slots = $state<string[]>([]);
 
@@ -34,6 +36,16 @@
 		return judgeBrew(brewed, visit, $game.reputation, []);
 	});
 	const canBrewNow = $derived(slots.length === 3);
+	const namedPotion = $derived(
+		preview && $game.upgrades.includes('cauldron') ? namePotion(preview.tags) : null
+	);
+	const canSwap = $derived(
+		$game.phase === 'service' &&
+			$game.upgrades.includes('ledger') &&
+			!$game.swappedToday &&
+			!result &&
+			Boolean(visit)
+	);
 
 	function pick(elementId: string): void {
 		if (slots.length >= 3 || result || !visit) return;
@@ -62,6 +74,11 @@
 
 	function handleEvening(): void {
 		finishService();
+		slots = [];
+	}
+
+	function handleSwap(): void {
+		swapCustomer();
 		slots = [];
 	}
 </script>
@@ -95,21 +112,33 @@
 			<p>{beat}</p>
 		</section>
 
-		{#if $game.phase === 'market'}
-			<EveningPlaceholder />
+		{#if $game.rentOutcome}
+			<RentScene />
+		{:else if $game.phase === 'market'}
+			<MarketScreen />
 		{:else if $game.phase === 'chapterEnd'}
-			<section class="interlude paper" data-testid="interlude" aria-labelledby="interlude-title">
-				<p class="hand quiet-kicker">the last of the candle</p>
-				<h2 id="interlude-title">The last day is done</h2>
-				<p>
-					The shop is still here. The ending is being written, page by page, by the choices you have
-					already made.
-				</p>
-			</section>
+			{#if rentDueOn($game.day) !== null}
+				<RentScene />
+			{:else}
+				<section class="interlude paper" data-testid="interlude" aria-labelledby="interlude-title">
+					<p class="hand quiet-kicker">the last of the candle</p>
+					<h2 id="interlude-title">The last day is done</h2>
+					<p>
+						The shop is still here. The ending is being written, page by page, by the choices you
+						have already made.
+					</p>
+				</section>
+			{/if}
 		{:else}
 			<section class="service" aria-label="Today’s service">
 				{#if visit && character}
 					<CustomerCard {visit} {character} onDecline={result ? undefined : handleDecline} />
+
+					{#if canSwap}
+						<button class="swap" type="button" onclick={handleSwap}>
+							Ask the ledger for another visitor
+						</button>
+					{/if}
 
 					{#if result}
 						<section class="result paper" role="status" aria-live="polite">
@@ -126,9 +155,11 @@
 								<p class="payment">Payment: {result.pay} coins</p>
 							{/if}
 							{#if result.reputationDelta > 0}
-								<p class="reputation">Reputation +1.</p>
+								<p class="reputation">Reputation +{result.reputationDelta}.</p>
 							{:else if result.reputationDelta < 0}
 								<p class="reputation">Reputation −1.</p>
+							{:else if result.refunded}
+								<p class="reputation muted">The apprentice returned the ingredients.</p>
 							{:else if result.tags.length === 0}
 								<p class="reputation muted">Nothing was consumed.</p>
 							{:else}
@@ -148,7 +179,12 @@
 					{:else}
 						<Cauldron {slots} onRemove={remove} />
 						<IngredientShelf entries={shelf} disabled={slots.length >= 3} onPick={pick} />
-						<BrewPreview {preview} enabled={canBrewNow} onBrew={handleBrew} />
+						<BrewPreview
+							{preview}
+							potionName={namedPotion}
+							enabled={canBrewNow}
+							onBrew={handleBrew}
+						/>
 					{/if}
 				{:else}
 					<section class="quiet paper" aria-labelledby="quiet-title">
@@ -371,6 +407,19 @@
 		background: rgba(255, 255, 255, 0.28);
 		color: var(--ink);
 		font-size: 1.02rem;
+	}
+
+	.swap {
+		width: 100%;
+		min-height: 44px;
+		margin-top: 0.55rem;
+		padding: 0.45rem 0.8rem;
+		border: 1px dashed rgba(110, 47, 58, 0.5);
+		border-radius: 4px 9px 4px 9px;
+		background: rgba(110, 47, 58, 0.06);
+		color: var(--burgundy);
+		font-family: 'Caveat', cursive;
+		font-size: 1.12rem;
 	}
 
 	.quiet {
