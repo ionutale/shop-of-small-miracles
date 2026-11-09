@@ -20,6 +20,7 @@
 		"e2e": "playwright test",
 		"validate": "vite-node scripts/validate-content.ts",
 		"pwa:assets": "pwa-assets-generator",
+		"check:bundle": "node scripts/check-bundle.mjs",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
