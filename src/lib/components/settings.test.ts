@@ -85,6 +85,32 @@ describe('settings', () => {
 		expect(get(game).settings).toEqual({ sound: false, reduceMotion: true });
 	});
 
+	it('traps focus in the reset dialog and restores it on cancel', async () => {
+		initGame(42);
+		const user = userEvent.setup();
+
+		render(SettingsScreen);
+
+		const trigger = screen.getByRole('button', { name: /reset all progress/i });
+		trigger.focus();
+		await user.click(trigger);
+
+		expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
+		const keep = screen.getByRole('button', { name: /keep my shop/i });
+		expect(keep).toHaveFocus();
+
+		const confirm = screen.getByRole('button', { name: /yes, clear the shop/i });
+		confirm.focus();
+		await user.tab();
+		expect(keep).toHaveFocus();
+
+		await user.keyboard('{Escape}');
+		await tick();
+
+		expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /reset all progress/i })).toHaveFocus();
+	});
+
 	it('can keep the shop after arming the reset', async () => {
 		initGame(42, saveFixture({ day: 9 }));
 		const user = userEvent.setup();

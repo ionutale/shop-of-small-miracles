@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/svelte';
+import { cleanup, render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { get } from 'svelte/store';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -41,14 +41,40 @@ describe('shop', () => {
 		await user.click(brewButton);
 
 		expect(screen.getByRole('status')).toHaveTextContent(/it does not burn/i);
-		expect(screen.getByText(/payment: 24 coins/i)).toBeInTheDocument();
+		const resultPanel = screen.getByTestId('result');
+		expect(within(resultPanel).getByText(/payment: 24 coins/i)).toBeInTheDocument();
 		expect(screen.getByText(/6 \/ 10/)).toBeInTheDocument();
-		expect(screen.getByText(/widow's lamp/i)).toBeInTheDocument();
+		expect(within(resultPanel).getByText(/widow's lamp/i)).toBeInTheDocument();
 
 		const state = get(game);
 		expect(state.coins).toBe(64);
 		expect(state.reputation).toBe(6);
 		expect(state.discovered).toHaveLength(1);
+	});
+
+	it('announces the brew result and payment in one polite live region', async () => {
+		const user = userEvent.setup();
+		render(ShopScreen);
+
+		await user.click(screen.getByRole('button', { name: /hydrogen/i }));
+		await user.click(screen.getByRole('button', { name: /sodium/i }));
+		await user.click(screen.getByRole('button', { name: /copper/i }));
+		await user.click(screen.getByRole('button', { name: /^brew$/i }));
+
+		const announcer = screen.getByTestId('announcer');
+		expect(announcer).toHaveAttribute('aria-live', 'polite');
+		expect(announcer).toHaveTextContent(/it does not burn/i);
+		expect(announcer).toHaveTextContent(/payment: 24 coins/i);
+	});
+
+	it('announces a rent setback once', async () => {
+		initGame(42, serviceSave({ day: 7, chapter: 1, phase: 'chapterEnd', coins: 0 }));
+		const user = userEvent.setup();
+		render(ShopScreen);
+
+		await user.click(screen.getByRole('button', { name: /pay rent/i }));
+
+		expect(screen.getByTestId('announcer')).toHaveTextContent(/setback|shelf/i);
 	});
 
 	it('disables brewing until three ingredients are chosen and lets a slot be cleared', async () => {
@@ -59,7 +85,7 @@ describe('shop', () => {
 		await user.click(screen.getByRole('button', { name: /hydrogen/i }));
 		expect(screen.getByRole('button', { name: /^brew$/i })).toBeDisabled();
 
-		await user.click(screen.getByRole('button', { name: /remove hydrogen from the cauldron/i }));
+		await user.click(screen.getByRole('button', { name: /cauldron slot 1: h hydrogen/i }));
 		expect(get(game).stock.find((entry) => entry.elementId === 'H')?.units).toBe(2);
 	});
 

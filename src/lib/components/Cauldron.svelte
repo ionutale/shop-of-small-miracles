@@ -18,17 +18,14 @@
 		{#each [0, 1, 2] as index (index)}
 			{@const id = slots[index]}
 			{@const element = id ? ELEMENT_BY_ID.get(id) : null}
-			{@const label = element
-				? `Remove ${element.name} from the cauldron`
-				: `Empty cauldron slot ${index + 1}`}
 			<button
 				type="button"
 				class="slot"
 				class:filled={Boolean(element)}
-				aria-label={label}
 				disabled={!element}
 				onclick={() => element && onRemove(index)}
 			>
+				<span class="visually-hidden">Cauldron slot {index + 1}:</span>
 				{#if element}
 					<span class="symbol">{element.symbol}</span>
 					<span class="name">{element.name}</span>

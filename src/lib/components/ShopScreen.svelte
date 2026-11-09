@@ -48,6 +48,15 @@
 			!result &&
 			Boolean(visit)
 	);
+	const announcement = $derived.by(() => {
+		if ($game.rentOutcome) return $game.rentOutcome.message;
+		if (!result) return '';
+		let text = result.line;
+		if (result.pay > 0) text += ` Payment: ${result.pay} coins.`;
+		if (result.reputationDelta > 0) text += ' Reputation up.';
+		if (result.refunded) text += ' The apprentice returned the ingredients.';
+		return text;
+	});
 	const showingEnding = $derived(
 		$game.phase === 'ending' ||
 			($game.phase === 'chapterEnd' &&
@@ -102,9 +111,13 @@
 	</div>
 
 	<main class="inner">
+		<p class="visually-hidden" role="status" aria-live="polite" data-testid="announcer">
+			{announcement}
+		</p>
+
 		<header class="masthead">
 			<p class="hand kicker">at the edge of a cold town, a small light is kept</p>
-			<h1>A Shop of Small Miracles</h1>
+			<h1 id="shop-title" tabindex="-1">A Shop of Small Miracles</h1>
 			<div class="status" aria-label="Shop status">
 				<p class="stat"><span>Day</span> <strong>{$game.day}</strong></p>
 				<p class="stat"><span>Chapter</span> <strong>{chapter.number}</strong></p>
@@ -151,7 +164,7 @@
 					{/if}
 
 					{#if result}
-						<section class="result paper" role="status" aria-live="polite">
+						<section class="result paper" data-testid="result">
 							<p class="hand verdict">
 								{result.kind === 'clean'
 									? 'A clean miracle'

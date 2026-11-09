@@ -75,10 +75,11 @@
 								disabled={offer.units <= 0 ||
 									$game.coins < price ||
 									shelfTotal >= $game.shelfCapacity}
-								aria-label={`Buy ${element.name} for ${price} coins`}
 								onclick={() => buy(index)}
 							>
-								{offer.units <= 0 ? 'Sold out' : `Buy for ${price} coins`}
+								{offer.units <= 0
+									? `${element.name} — sold out`
+									: `Buy ${element.name} for ${price} coins`}
 							</button>
 						</li>
 					{/if}

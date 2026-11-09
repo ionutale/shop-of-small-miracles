@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { chapterForDay, rentDueOn } from '../data/chapters';
 	import { game, leaveRentScene, settleRent } from '../stores/game';
 
@@ -6,24 +7,28 @@
 	const rent = $derived(rentDueOn($game.day) ?? chapter.rent);
 	const outcome = $derived($game.rentOutcome);
 
+	let heading = $state<HTMLHeadingElement | undefined>();
+
+	$effect(() => {
+		void outcome;
+		void tick().then(() => heading?.focus());
+	});
+
 	function pay(): void {
 		settleRent();
 	}
 
-	function leave(): void {
+	async function leave(): Promise<void> {
 		leaveRentScene();
+		await tick();
+		document.getElementById('shop-title')?.focus();
 	}
 </script>
 
-<section
-	class="rent paper"
-	data-testid="rent-scene"
-	aria-labelledby="rent-title"
-	aria-live="polite"
->
+<section class="rent paper" data-testid="rent-scene" aria-labelledby="rent-title">
 	{#if outcome}
 		<p class="hand kicker">the chapter ledger</p>
-		<h2 id="rent-title">
+		<h2 id="rent-title" tabindex="-1" bind:this={heading}>
 			{outcome.kind === 'paid' ? 'Rent paid' : 'A setback, not an ending'}
 		</h2>
 		<p class="message">{outcome.message}</p>
@@ -42,7 +47,7 @@
 		<button class="continue" type="button" onclick={leave}>Continue</button>
 	{:else}
 		<p class="hand kicker">the chapter ledger</p>
-		<h2 id="rent-title">Rent is due</h2>
+		<h2 id="rent-title" tabindex="-1" bind:this={heading}>Rent is due</h2>
 		<p>
 			{chapter.title} closes tonight. The landlord’s man sets down his empty book and asks for
 			<strong>{rent} coins</strong>.

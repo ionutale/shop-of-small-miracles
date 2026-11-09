@@ -80,7 +80,7 @@ test('serves the first customer by tap in under a minute and restores the shop a
 	await page.getByRole('button', { name: /^brew$/i }).click();
 
 	await expect(page.getByRole('status')).toContainText(/it does not burn/i);
-	await expect(page.getByText(/payment: 24 coins/i)).toBeVisible();
+	await expect(page.getByTestId('result').getByText(/payment: 24 coins/i)).toBeVisible();
 	await expect(page.getByText(/6 \/ 10/)).toBeVisible();
 	await expect(
 		page.getByRole('region', { name: /today’s service/i }).getByText(/widow's lamp/i)
@@ -95,7 +95,7 @@ test('serves the first customer by tap in under a minute and restores the shop a
 	await page.getByRole('button', { name: /next visitor/i }).click();
 	await expect(page.getByTestId('visitor-count')).toContainText('2 of 3');
 	await expect(page.locator('.customer h2')).toBeVisible();
-	await expect(page.getByRole('status')).toHaveCount(0);
+	await expect(page.getByTestId('announcer')).toHaveText('');
 	await expect(page.getByText(/2 left/).first()).toBeVisible();
 
 	await page.reload();

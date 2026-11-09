@@ -26,7 +26,6 @@
 					class="element"
 					class:empty={units === 0}
 					disabled={disabled || units === 0}
-					aria-label={`${element.name} ${element.symbol}, ${element.primary} essence, ${units} units left`}
 					onclick={() => onPick(element.id)}
 				>
 					<span class="symbol">{element.symbol}</span>

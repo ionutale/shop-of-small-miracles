@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+	import { trapFocus } from '../actions/trapFocus';
 	import { playSound } from '../game/sound';
 	import { appInstalled, installPrompt } from '../stores/install';
 	import { game, resetGame, setReduceMotion, setSound } from '../stores/game';
@@ -6,15 +8,24 @@
 
 	let confirming = $state(false);
 	let installedNow = $state(false);
+	let resetTrigger = $state<HTMLButtonElement | undefined>();
 	let installed = $derived(
 		typeof window !== 'undefined' &&
 			typeof window.matchMedia === 'function' &&
 			window.matchMedia('(display-mode: standalone)').matches
 	);
 
-	function clearShop(): void {
+	async function clearShop(): Promise<void> {
 		resetGame();
 		confirming = false;
+		await tick();
+		resetTrigger?.focus();
+	}
+
+	async function cancelReset(): Promise<void> {
+		confirming = false;
+		await tick();
+		resetTrigger?.focus();
 	}
 
 	function toggleSound(enabled: boolean): void {
@@ -91,18 +102,34 @@
 	<section class="block" aria-labelledby="progress-title">
 		<h2 id="progress-title">Progress</h2>
 		{#if confirming}
-			<p>
-				This clears the save, the recipe book, every choice, and the ledger. It cannot be undone.
-			</p>
-			<div class="actions">
-				<button class="quiet" type="button" onclick={() => (confirming = false)}
-					>Keep my shop</button
+			<div class="backdrop">
+				<div
+					class="dialog paper"
+					role="dialog"
+					aria-modal="true"
+					aria-labelledby="reset-title"
+					aria-describedby="reset-note"
+					use:trapFocus={{ onEscape: cancelReset }}
 				>
-				<button class="danger" type="button" onclick={clearShop}>Yes, clear the shop</button>
+					<h3 id="reset-title">Reset all progress?</h3>
+					<p id="reset-note">
+						This clears the save, the recipe book, every choice, and the ledger. It cannot be
+						undone.
+					</p>
+					<div class="actions">
+						<button class="quiet" type="button" onclick={cancelReset}>Keep my shop</button>
+						<button class="danger" type="button" onclick={clearShop}>Yes, clear the shop</button>
+					</div>
+				</div>
 			</div>
 		{:else}
 			<p>Start again from a single hydrogen atom and an empty ledger.</p>
-			<button class="danger" type="button" onclick={() => (confirming = true)}>
+			<button
+				class="danger"
+				type="button"
+				bind:this={resetTrigger}
+				onclick={() => (confirming = true)}
+			>
 				Reset all progress
 			</button>
 		{/if}
@@ -130,6 +157,33 @@
 	h2 {
 		margin: 0 0 0.6rem;
 		font-size: 1.45rem;
+	}
+
+	h3 {
+		margin: 0 0 0.45rem;
+		font-size: 1.3rem;
+	}
+
+	.backdrop {
+		position: fixed;
+		z-index: 40;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+		background: rgba(36, 26, 18, 0.55);
+	}
+
+	.dialog {
+		width: min(100%, 28rem);
+		padding: 1.2rem 1.1rem;
+		border: 1px solid rgba(59, 42, 26, 0.3);
+		border-radius: 6px 18px 8px 15px;
+	}
+
+	.dialog:focus-visible {
+		outline: 3px solid var(--burgundy);
+		outline-offset: 4px;
 	}
 
 	p {
