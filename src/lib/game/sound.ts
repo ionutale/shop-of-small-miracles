@@ -9,14 +9,16 @@ type AudioFactory = () => AudioContext;
 
 let muted = false;
 let context: AudioContext | null = null;
+let roomStarted = false;
 let factory: AudioFactory = () => new AudioContext();
 
 function release(): void {
 	const current = context;
 	context = null;
+	roomStarted = false;
 	if (!current) return;
 	try {
-		void current.close();
+		void current.close().catch(() => {});
 	} catch {
 		// A context that cannot close is already gone.
 	}
@@ -83,6 +85,30 @@ function paperNoise(ctx: AudioContext, start: number, duration: number, peak: nu
 	source.stop(start + duration);
 }
 
+/**
+ * A low room bed that starts on the first cue and runs until sound is turned
+ * off. Two detuned sines at a very low gain read as a warm room, not a drone.
+ */
+function startRoomBed(ctx: AudioContext): void {
+	if (roomStarted) return;
+	roomStarted = true;
+
+	for (const frequency of [110, 165]) {
+		try {
+			const oscillator = ctx.createOscillator();
+			const gain = ctx.createGain();
+			oscillator.type = 'sine';
+			oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+			gain.gain.setValueAtTime(0.006, ctx.currentTime);
+			oscillator.connect(gain);
+			gain.connect(ctx.destination);
+			oscillator.start(ctx.currentTime);
+		} catch {
+			// One missing voice is quieter, not fatal.
+		}
+	}
+}
+
 function render(ctx: AudioContext, cue: SoundCue): void {
 	const now = ctx.currentTime;
 
@@ -116,8 +142,9 @@ export function playSound(cue: SoundCue): boolean {
 	try {
 		context ??= factory();
 		if (!context) return false;
-		if (context.state === 'suspended') void context.resume();
-		render(context, cue);
+		if (context.state === 'suspended') void context.resume().catch(() => {});
+		startRoomBed(context);
+		if (cue !== 'room') render(context, cue);
 		return true;
 	} catch {
 		return false;

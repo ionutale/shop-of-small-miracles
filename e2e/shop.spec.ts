@@ -310,3 +310,20 @@ test('a rent shortfall names what was taken and the shop continues', async ({ pa
 	await expect(page.getByText(/10 coins/).first()).toBeVisible();
 	await expect(page.getByText(/3 \/ 10/).first()).toBeVisible();
 });
+
+test('a double-click on reset does not clear the shop', async ({ page }) => {
+	await page.addInitScript(
+		([key, save]) => localStorage.setItem(key, save),
+		[SAVE_KEY, JSON.stringify(seededSave({ day: 9, activeVisitId: 'widow-lamp' }))]
+	);
+	await page.goto('/');
+
+	await page.getByRole('button', { name: /^settings$/i }).click();
+	await page.getByRole('button', { name: /reset all progress/i }).dblclick();
+
+	const day = await page.evaluate(
+		(key) => JSON.parse(localStorage.getItem(key) ?? '{}').day,
+		SAVE_KEY
+	);
+	expect(day).toBe(9);
+});

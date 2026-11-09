@@ -57,6 +57,7 @@
 
 	function pick(elementId: string): void {
 		if (slots.length >= 3 || result || !visit) return;
+		playSound('glass');
 		slots = [...slots, elementId];
 	}
 

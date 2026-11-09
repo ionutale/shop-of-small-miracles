@@ -274,8 +274,11 @@ export function dismissMorning(): void {
 	game.set({ ...current, morningSeenDay: current.day });
 }
 
+/** Start over from day one but keep the player's comfort settings. */
 export function resetGame(seed = 42): void {
-	initGame(seed, createInitialSave(seed));
+	const current = get(game);
+	const fresh = createInitialSave(seed);
+	initGame(seed, { ...fresh, settings: { ...current.settings } });
 }
 
 /** The two comfort settings; both autosave through the store subscription. */

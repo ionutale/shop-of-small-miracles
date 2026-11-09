@@ -45,7 +45,8 @@
 					<div class="options">
 						{#each choice.options as option (option.id)}
 							<button class="option" type="button" onclick={() => choose(option.id)}>
-								{option.label}
+								<span class="wax-seal option-seal" aria-hidden="true"></span>
+								<span>{option.label}</span>
 							</button>
 						{/each}
 					</div>
@@ -113,9 +114,18 @@
 	}
 
 	.option {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
 		font-family: 'Caveat', cursive;
 		font-size: 1.15rem;
 		color: var(--burgundy);
+	}
+
+	.option-seal {
+		width: 1.2rem;
+		height: 1.2rem;
+		font-size: 0.65rem;
 	}
 
 	.begin {

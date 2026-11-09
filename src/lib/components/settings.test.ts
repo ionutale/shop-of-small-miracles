@@ -30,7 +30,7 @@ describe('settings', () => {
 		expect(get(game).settings).toEqual({ sound: false, reduceMotion: true });
 	});
 
-	it('applies the reduced-motion class to the page', async () => {
+	it('applies and removes the reduced-motion class on the page', async () => {
 		initGame(42);
 		render(Page);
 		await tick();
@@ -41,6 +41,11 @@ describe('settings', () => {
 		await tick();
 
 		expect(document.documentElement.classList.contains('reduce-motion')).toBe(true);
+
+		setReduceMotion(false);
+		await tick();
+
+		expect(document.documentElement.classList.contains('reduce-motion')).toBe(false);
 	});
 
 	it('resets progress only on a second confirmation', async () => {
@@ -61,6 +66,21 @@ describe('settings', () => {
 		expect(get(game).coins).toBe(40);
 		expect(get(game).flags).toEqual([]);
 		expect(screen.queryByRole('button', { name: /yes, clear the shop/i })).not.toBeInTheDocument();
+	});
+
+	it('keeps the comfort settings when progress resets', async () => {
+		initGame(42);
+		const user = userEvent.setup();
+
+		render(SettingsScreen);
+
+		await user.click(screen.getByRole('checkbox', { name: /sound/i }));
+		await user.click(screen.getByRole('checkbox', { name: /reduce motion/i }));
+		await user.click(screen.getByRole('button', { name: /reset all progress/i }));
+		await user.click(screen.getByRole('button', { name: /yes, clear the shop/i }));
+
+		expect(get(game).day).toBe(1);
+		expect(get(game).settings).toEqual({ sound: false, reduceMotion: true });
 	});
 
 	it('can keep the shop after arming the reset', async () => {

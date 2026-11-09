@@ -16,7 +16,7 @@ describe('page', () => {
 	it('opens the recipe book and the journal from the page tabs', async () => {
 		render(Page);
 
-		await userEvent.click(screen.getByRole('button', { name: /recipe book/i }));
+		await userEvent.click(screen.getByRole('button', { name: /^book$/i }));
 		expect(screen.getByRole('heading', { name: /the recipe book/i })).toBeInTheDocument();
 
 		await userEvent.click(screen.getByRole('button', { name: /journal/i }));
@@ -37,11 +37,11 @@ describe('page', () => {
 	it('keeps each screen’s state when switching tabs', async () => {
 		render(Page);
 
-		await userEvent.click(screen.getByRole('button', { name: /recipe book/i }));
+		await userEvent.click(screen.getByRole('button', { name: /^book$/i }));
 		await userEvent.type(screen.getByLabelText(/search the book/i), 'hush');
 
 		await userEvent.click(screen.getByRole('button', { name: /journal/i }));
-		await userEvent.click(screen.getByRole('button', { name: /recipe book/i }));
+		await userEvent.click(screen.getByRole('button', { name: /^book$/i }));
 
 		expect(screen.getByLabelText(/search the book/i)).toHaveValue('hush');
 	});

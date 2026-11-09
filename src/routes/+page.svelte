@@ -11,7 +11,7 @@
 
 	const TABS: readonly { id: Tab; label: string }[] = [
 		{ id: 'shop', label: 'Shop' },
-		{ id: 'book', label: 'Recipe book' },
+		{ id: 'book', label: 'Book' },
 		{ id: 'journal', label: 'Journal' },
 		{ id: 'settings', label: 'Settings' }
 	];

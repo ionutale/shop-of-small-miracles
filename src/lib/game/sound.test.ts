@@ -114,6 +114,21 @@ describe('procedural sound', () => {
 		expect(calls.sources).toBeGreaterThan(0);
 	});
 
+	it('starts the room bed once and does not restart it on every cue', () => {
+		const { context, calls } = fakeAudio();
+		setSoundContextFactory(() => context);
+		setSoundEnabled(true);
+
+		playSound('paper');
+		const afterFirst = calls.oscillators;
+
+		expect(afterFirst).toBeGreaterThanOrEqual(3);
+
+		playSound('paper');
+
+		expect(calls.oscillators - afterFirst).toBe(1);
+	});
+
 	it('resumes a suspended context before playing', () => {
 		const { context, calls } = fakeAudio('suspended');
 		setSoundContextFactory(() => context);

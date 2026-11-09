@@ -27,6 +27,8 @@
 
 		<label class="toggle">
 			<input
+				id="sound-toggle"
+				name="sound"
 				type="checkbox"
 				checked={$game.settings.sound}
 				onchange={(event) => toggleSound(event.currentTarget.checked)}
@@ -39,6 +41,8 @@
 
 		<label class="toggle">
 			<input
+				id="motion-toggle"
+				name="motion"
 				type="checkbox"
 				checked={$game.settings.reduceMotion}
 				onchange={(event) => setReduceMotion(event.currentTarget.checked)}
@@ -72,10 +76,10 @@
 				This clears the save, the recipe book, every choice, and the ledger. It cannot be undone.
 			</p>
 			<div class="actions">
-				<button class="danger" type="button" onclick={clearShop}>Yes, clear the shop</button>
 				<button class="quiet" type="button" onclick={() => (confirming = false)}
 					>Keep my shop</button
 				>
+				<button class="danger" type="button" onclick={clearShop}>Yes, clear the shop</button>
 			</div>
 		{:else}
 			<p>Start again from a single hydrogen atom and an empty ledger.</p>

@@ -41,24 +41,3 @@ export const TAG_LABELS: Record<Tag, string> = {
 	Grief: 'Grief',
 	Hollow: 'Hollow'
 };
-
-export const TAG_GLYPHS: Record<Tag, string> = {
-	Light: '✦',
-	Still: '◌',
-	Warm: '♨',
-	Cold: '❄',
-	Sharp: '⌁',
-	Soft: '❋',
-	Heavy: '⚖',
-	Dreaming: '☾',
-	Bitter: '✧',
-	Bright: '☀',
-	Bound: '⛓',
-	Ground: '⛰',
-	Spark: '⚡',
-	Calm: '≈',
-	Cleanse: '✚',
-	Radiant: '✺',
-	Grief: '♡',
-	Hollow: '◯'
-};
