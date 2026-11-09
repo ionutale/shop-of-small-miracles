@@ -6,6 +6,7 @@
 	import '@fontsource/caveat/700.css';
 	import '../lib/styles/base.css';
 	import '../lib/styles/paper.css';
+	import PwaUpdate from '../lib/components/PwaUpdate.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -20,3 +21,4 @@
 </svelte:head>
 
 {@render children()}
+<PwaUpdate />

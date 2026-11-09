@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { playSound } from '../game/sound';
+	import { installPrompt } from '../stores/install';
 	import { game, resetGame, setReduceMotion, setSound } from '../stores/game';
 	import ScreenShell from './ScreenShell.svelte';
 
@@ -18,6 +19,14 @@
 	function toggleSound(enabled: boolean): void {
 		setSound(enabled);
 		if (enabled) playSound('chime');
+	}
+
+	async function install(): Promise<void> {
+		const prompt = $installPrompt;
+		if (!prompt) return;
+		await prompt.prompt();
+		await prompt.userChoice;
+		installPrompt.set(null);
 	}
 </script>
 
@@ -65,6 +74,9 @@
 				Add this shop to your home screen from your browser menu. After the first visit it opens
 				without a network, like a paper book on a shelf.
 			</p>
+			{#if $installPrompt}
+				<button class="install" type="button" onclick={install}>Install the shop</button>
+			{/if}
 		{/if}
 		<p class="note">No app store, no account, and no download.</p>
 	</section>

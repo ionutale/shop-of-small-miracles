@@ -5,6 +5,7 @@
 	import RecipeBook from '../lib/components/RecipeBook.svelte';
 	import SettingsScreen from '../lib/components/SettingsScreen.svelte';
 	import ShopScreen from '../lib/components/ShopScreen.svelte';
+	import { captureInstallPrompt } from '../lib/stores/install';
 	import { game, initGame } from '../lib/stores/game';
 
 	type Tab = 'shop' | 'book' | 'journal' | 'settings';
@@ -27,6 +28,7 @@
 
 	onMount(() => {
 		initGame();
+		return captureInstallPrompt();
 	});
 
 	$effect(() => {

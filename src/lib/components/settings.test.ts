@@ -2,8 +2,10 @@ import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
 import { get } from 'svelte/store';
+import { vi } from 'vitest';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Page from '../../routes/+page.svelte';
+import { installPrompt, type InstallPromptEvent } from '../stores/install';
 import { game, initGame, setReduceMotion } from '../stores/game';
 import { saveFixture } from '../test/fixtures';
 import SettingsScreen from './SettingsScreen.svelte';
@@ -94,6 +96,19 @@ describe('settings', () => {
 
 		expect(get(game).day).toBe(9);
 		expect(screen.getByRole('button', { name: /reset all progress/i })).toBeInTheDocument();
+	});
+
+	it('offers the captured install prompt when the browser provides one', () => {
+		initGame(42);
+		installPrompt.set({
+			prompt: vi.fn(async () => {}),
+			userChoice: Promise.resolve({ outcome: 'accepted' })
+		} as unknown as InstallPromptEvent);
+
+		render(SettingsScreen);
+
+		expect(screen.getByRole('button', { name: /install the shop/i })).toBeInTheDocument();
+		installPrompt.set(null);
 	});
 
 	it('offers install guidance and an about note', () => {
