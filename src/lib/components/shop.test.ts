@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { get } from 'svelte/store';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { serviceSave } from '../test/fixtures';
-import { createInitialSave } from '../game/storage';
+import { createInitialSave, SAVE_KEY } from '../game/storage';
 import { game, initGame } from '../stores/game';
 import ShopScreen from './ShopScreen.svelte';
 
@@ -17,6 +17,20 @@ afterEach(() => {
 });
 
 describe('shop', () => {
+	it('shows a recovery notice for a corrupt save and lets it be dismissed', async () => {
+		localStorage.setItem(SAVE_KEY, '{not a save');
+		initGame(42);
+		const user = userEvent.setup();
+
+		render(ShopScreen);
+
+		expect(screen.getByText(/old save could not be read/i)).toBeInTheDocument();
+
+		await user.click(screen.getByRole('button', { name: /dismiss/i }));
+
+		expect(screen.queryByText(/old save could not be read/i)).not.toBeInTheDocument();
+	});
+
 	it('shows the shop sign, one customer, two requested essences, and today’s story beat', () => {
 		render(ShopScreen);
 		expect(screen.getByRole('heading', { name: /a shop of small miracles/i })).toBeInTheDocument();

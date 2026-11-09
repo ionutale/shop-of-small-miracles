@@ -6,7 +6,8 @@ A storybook shop sim about brewing small kindnesses for a cold town. Three prima
 
 ```bash
 pnpm install
-pnpm dev          # http://localhost:5173
+pnpm exec playwright install   # once, for the e2e suite
+pnpm dev                       # http://localhost:5173
 ```
 
 The game is client-rendered (`ssr = false`) and builds to a static site with `@sveltejs/adapter-static` and `200.html` as the SPA fallback.
@@ -25,7 +26,7 @@ pnpm check:bundle  # 180 KB gzip budget for initial JS
 pnpm pwa:assets    # regenerate icons from static/favicon.svg
 ```
 
-`pnpm test:e2e` builds first and then runs Playwright. `pnpm e2e` assumes a recent `pnpm build`; both start their own preview server. The suite covers the first customer, mid-day resume, rent setbacks, all three endings, the PWA/offline reload, keyboard-only play, 44 px targets, and axe audits of Shop, Market, Book, Journal, and Settings.
+`pnpm test:e2e` and `pnpm e2e` both run Playwright; the configured web server builds the app and serves the production preview itself. The suite covers the first customer, mid-day resume, rent setbacks, all three endings, the PWA/offline reload, keyboard-only play, 44 px targets, and axe audits of Shop, Market, Book, Journal, and Settings.
 
 ## Content authoring
 
@@ -40,7 +41,7 @@ All content is typed data under `src/lib/data/` and validated by `pnpm validate`
 - **Story choices** live in `choices.ts`: one authored choice per chosen morning; the first option is the kind path. Flags are limited to the authored set.
 - **Endings** live in `endings.ts`: The Shop Endures, The Last Miracle, and A Quiet Closing. `game/story.ts` decides from reputation, relationships, flags, and setbacks.
 
-Run `pnpm validate` after editing content. It checks element/tag/potion counts and uniqueness, that every visit's two tags are reachable from three shelf units, chapter and rent coverage, upgrade and ending shape, choice days and flags, and relationship bounds.
+Run `pnpm validate` after editing content. It checks element, potion, character, visit, upgrade, and ending counts and uniqueness; tag validity; that every visit's two tags are reachable from three shelf units; chapter and rent coverage; choice days and flags; and relationship bounds.
 
 ### The eligibility invariant
 
@@ -48,21 +49,21 @@ Customers are stock-aware. A visit is only offered when the current shelf can ac
 
 ### Soft stakes
 
-There is no game-over state. Missing rent is a setback: the landlord takes an upgrade or shelf space, reputation drops by 2, coins are set to 10, and a story branch opens. The shop continues, and a quiet closing is still framed as a choice rather than a punishment. No ending is labelled "bad".
+There is no game-over state. Missing rent is a setback: the landlord takes the most expensive upgrade or one unit of shelf capacity, reputation drops by 2, coins are set to 10, and the setback is recorded toward the ending. The shop always continues, and a quiet closing is still framed as a choice rather than a punishment. No ending is labelled "bad".
 
 ## Saving
 
-Progress lives in `localStorage` under `small-miracles:save:v1`. Every customer, brew, purchase, and phase change autosaves. A corrupt or tampered save falls back to a fresh day-one shop with a visible recovery notice. Reset progress is two-step and keeps the sound and reduced-motion settings.
+Progress lives in `localStorage` under `small-miracles:save:v1`. Every customer, brew, purchase, and phase change autosaves. A save that cannot be parsed (wrong version, impossible day, malformed fields) falls back to a fresh day-one shop with a dismissible recovery notice. Reset progress is two-step and keeps the sound and reduced-motion settings.
 
 ## PWA and offline
 
-The manifest, service worker, and icons are generated during `pnpm build`. After one online load the shop opens offline and resumes the exact day. A new build shows a "A new page is ready" prompt instead of reloading mid-service. Install guidance lives in Settings, with an install button when the browser offers one. To regenerate icons after changing `static/favicon.svg`:
+The manifest and service worker are generated during `pnpm build`; the icon PNGs are generated once by `pnpm pwa:assets` and copied into the build. After one online load the shop opens offline and resumes the exact day. A new build shows a "A new page is ready" prompt instead of reloading mid-service. Install guidance lives in Settings, with an install button when the browser offers one. To regenerate icons after changing `static/favicon.svg`:
 
 ```bash
 pnpm pwa:assets
 ```
 
-The icon config (parchment maskable/apple backgrounds) is in `pwa-assets.config.ts`.
+The icon config (parchment maskable/apple backgrounds) is in `pwa-assets.config.ts`; rerun `pnpm pwa:assets` whenever `static/favicon.svg` changes.
 
 ## Deploy
 

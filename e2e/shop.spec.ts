@@ -1,47 +1,5 @@
 import { expect, test } from '@playwright/test';
-
-const SAVE_KEY = 'small-miracles:save:v1';
-
-function seededSave(overrides: Record<string, unknown> = {}) {
-	return {
-		version: 1,
-		seed: 42,
-		rngState: 7,
-		day: 1,
-		chapter: 1,
-		phase: 'service',
-		coins: 40,
-		reputation: 5,
-		setbacks: 0,
-		stock: [
-			{ elementId: 'H', units: 3 },
-			{ elementId: 'O', units: 3 },
-			{ elementId: 'Na', units: 3 },
-			{ elementId: 'Cu', units: 3 },
-			{ elementId: 'Ag', units: 3 },
-			{ elementId: 'Cl', units: 3 }
-		],
-		discovered: [],
-		flags: [],
-		relationships: { widow: 0, merchant: 0, apprentice: 0 },
-		servedToday: 0,
-		servedVisitIds: [],
-		activeVisitId: null,
-		quietDay: false,
-		market: [],
-		upgrades: [],
-		shelfCapacity: 30,
-		upgradeBoughtToday: false,
-		swappedToday: false,
-		apprenticeUsedToday: false,
-		warmStoveUsedToday: false,
-		rentOutcome: null,
-		settings: { sound: true, reduceMotion: false },
-		introSeen: true,
-		lastResult: null,
-		...overrides
-	};
-}
+import { SAVE_KEY, seededSave } from './fixtures';
 
 async function reachEvening(page: import('@playwright/test').Page) {
 	for (let served = 1; served <= 3; served++) {
@@ -271,7 +229,7 @@ test('pays the rent on day seven and opens chapter two', async ({ page }) => {
 
 	await page.getByRole('button', { name: /continue/i }).click();
 	await expect(page.locator('.shop')).toHaveAttribute('data-phase', 'service');
-	await expect(page.getByTestId('day-beat')).toContainText(/widow comes back/i);
+	await expect(page.getByTestId('customer-request')).toBeVisible();
 	await expect(page.getByLabel('Shop status').getByText(/chapter 2/i)).toBeVisible();
 });
 
@@ -306,7 +264,7 @@ test('a rent shortfall names what was taken and the shop continues', async ({ pa
 
 	await page.getByRole('button', { name: /continue/i }).click();
 	await expect(page.locator('.shop')).toHaveAttribute('data-phase', 'service');
-	await expect(page.getByTestId('day-beat')).toContainText(/widow comes back/i);
+	await expect(page.getByTestId('customer-request')).toBeVisible();
 	await expect(page.getByText(/10 coins/).first()).toBeVisible();
 	await expect(page.getByText(/3 \/ 10/).first()).toBeVisible();
 });

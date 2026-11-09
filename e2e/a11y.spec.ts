@@ -1,54 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { SAVE_KEY, seededSave } from './fixtures';
+import type { SaveState } from '../src/lib/types';
 
 test.use({ viewport: { width: 360, height: 740 } });
 
-const SAVE_KEY = 'small-miracles:save:v1';
-
-function seededSave(overrides: Record<string, unknown> = {}) {
-	return {
-		version: 1,
-		seed: 42,
-		rngState: 7,
-		day: 1,
-		chapter: 1,
-		phase: 'service',
-		coins: 40,
-		reputation: 5,
-		setbacks: 0,
-		stock: [
-			{ elementId: 'H', units: 3 },
-			{ elementId: 'O', units: 3 },
-			{ elementId: 'Na', units: 3 },
-			{ elementId: 'Cu', units: 3 },
-			{ elementId: 'Ag', units: 3 },
-			{ elementId: 'Cl', units: 3 }
-		],
-		discovered: [],
-		flags: [],
-		relationships: { widow: 0, merchant: 0, apprentice: 0 },
-		servedToday: 0,
-		servedVisitIds: [],
-		activeVisitId: 'widow-lamp',
-		quietDay: false,
-		market: [],
-		upgrades: [],
-		shelfCapacity: 30,
-		upgradeBoughtToday: false,
-		swappedToday: false,
-		apprenticeUsedToday: false,
-		warmStoveUsedToday: false,
-		rentOutcome: null,
-		settings: { sound: false, reduceMotion: true },
-		introSeen: true,
-		lastResult: null,
-		morningSeenDay: 21,
-		choices: [],
-		...overrides
-	};
-}
-
-async function open(page: Page, overrides: Record<string, unknown> = {}, tab?: RegExp) {
+async function open(page: Page, overrides: Partial<SaveState> = {}, tab?: RegExp) {
 	await page.addInitScript(
 		([key, save]) => localStorage.setItem(key, save),
 		[SAVE_KEY, JSON.stringify(seededSave(overrides))]

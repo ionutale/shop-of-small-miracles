@@ -5,7 +5,15 @@
 	import { namePotion } from '../data/potions';
 	import { brewTags, judgeBrew } from '../game/brew';
 	import { playSound } from '../game/sound';
-	import { brew, decline, finishService, game, nextCustomer, swapCustomer } from '../stores/game';
+	import {
+		brew,
+		decline,
+		finishService,
+		game,
+		nextCustomer,
+		recovered,
+		swapCustomer
+	} from '../stores/game';
 	import BrewPreview from './BrewPreview.svelte';
 	import Cauldron from './Cauldron.svelte';
 	import CustomerCard from './CustomerCard.svelte';
@@ -114,6 +122,13 @@
 		<p class="visually-hidden" role="status" aria-live="polite" data-testid="announcer">
 			{announcement}
 		</p>
+
+		{#if $recovered}
+			<div class="recovery" role="status">
+				<p>The old save could not be read. The shop starts fresh.</p>
+				<button type="button" onclick={() => recovered.set(false)}>Dismiss</button>
+			</div>
+		{/if}
 
 		<header class="masthead">
 			<p class="hand kicker">at the edge of a cold town, a small light is kept</p>
@@ -309,6 +324,31 @@
 
 	.masthead {
 		margin-bottom: 1rem;
+	}
+
+	.recovery {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin: 0 0 0.8rem;
+		padding: 0.5rem 0.7rem;
+		border: 1px solid rgba(110, 47, 58, 0.4);
+		border-radius: 4px 10px 4px 10px;
+		background: rgba(110, 47, 58, 0.08);
+		font-size: 0.92rem;
+	}
+
+	.recovery p {
+		flex: 1;
+		margin: 0;
+	}
+
+	.recovery button {
+		min-height: 44px;
+		padding: 0.35rem 0.7rem;
+		border: 1px solid rgba(59, 42, 26, 0.35);
+		border-radius: 4px 8px 4px 8px;
+		background: rgba(255, 255, 255, 0.35);
 	}
 
 	.kicker {

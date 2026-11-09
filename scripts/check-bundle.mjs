@@ -23,9 +23,14 @@ try {
 	process.exit(1);
 }
 
+if (files.length === 0) {
+	console.error('No client JS found under build/_app. Run `pnpm build` again.');
+	process.exit(1);
+}
+
 const total = files.reduce((sum, file) => sum + gzipSync(readFileSync(file)).length, 0);
 const kb = total / 1024;
-console.log(`Initial JS gzip: ${kb.toFixed(1)} KB across ${files.length} chunks`);
+console.log(`Client JS gzip: ${kb.toFixed(1)} KB across ${files.length} chunks`);
 
 if (kb > BUDGET_KB) {
 	console.error(`Budget exceeded: initial JS must stay at or below ${BUDGET_KB} KB gzip.`);
