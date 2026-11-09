@@ -98,6 +98,26 @@ for (const screen of screens) {
 	});
 }
 
+test('the title screen has no axe violations', async ({ page }) => {
+	await page.goto('/');
+	await expect(page.getByRole('button', { name: /enter the shop/i })).toBeVisible();
+
+	const results = await new AxeBuilder({ page }).analyze();
+
+	expect(results.violations.map((violation) => violation.id)).toEqual([]);
+});
+
+test('the element detail dialog has no axe violations', async ({ page }) => {
+	await open(page);
+
+	await page.getByRole('button', { name: /^h notes$/i }).click();
+	await expect(page.getByRole('dialog')).toBeVisible();
+
+	const results = await new AxeBuilder({ page }).analyze();
+
+	expect(results.violations.map((violation) => violation.id)).toEqual([]);
+});
+
 test('the reset dialog has no axe violations', async ({ page }) => {
 	await open(page, {}, /^settings$/i);
 

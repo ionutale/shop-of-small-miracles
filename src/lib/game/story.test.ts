@@ -126,6 +126,18 @@ describe('the authored arc', () => {
 		expect(selectEnding({ ...save, day: 21 }).id).toBe('last-miracle');
 	});
 
+	it('keeps the last miracle reachable when one widow morning is missed', () => {
+		let save = saveFixture({ day: 1, reputation: 5, morningSeenDay: 0 });
+
+		for (const choice of CHOICES) {
+			if (choice.day === 6) continue;
+			save = applyChoice({ ...save, day: choice.day }, choice.options[0].id);
+		}
+
+		expect(save.relationships.widow).toBeGreaterThanOrEqual(6);
+		expect(selectEnding({ ...save, day: 21 }).id).toBe('last-miracle');
+	});
+
 	it('reaches a quiet closing from the day-20 close choice', () => {
 		const closed = applyChoice(saveFixture({ day: 20 }), 'd20-close-tomorrow');
 

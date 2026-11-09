@@ -103,6 +103,29 @@ describe('shop', () => {
 		expect(screen.getByTestId('announcer')).toHaveTextContent(/setback|shelf/i);
 	});
 
+	it('opens an element detail card from the shelf and restores focus', async () => {
+		const user = userEvent.setup();
+		render(ShopScreen);
+
+		const notes = screen.getByRole('button', { name: /^h notes$/i });
+		notes.focus();
+		await user.click(notes);
+
+		const dialog = screen.getByRole('dialog');
+		expect(within(dialog).getByRole('heading', { name: /hydrogen/i })).toBeInTheDocument();
+		expect(within(dialog).getByText('Primary essence')).toBeInTheDocument();
+		expect(within(dialog).getByText('Light')).toBeInTheDocument();
+		expect(within(dialog).getByText('Secondary essence')).toBeInTheDocument();
+		expect(within(dialog).getByText('Warm')).toBeInTheDocument();
+		expect(dialog).toHaveTextContent(/3 coins/i);
+		expect(dialog).toHaveTextContent(/2 units/i);
+
+		await user.keyboard('{Escape}');
+
+		expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+		expect(notes).toHaveFocus();
+	});
+
 	it('filters the shelf by essence and shows both essences on each card', async () => {
 		const user = userEvent.setup();
 		render(ShopScreen);

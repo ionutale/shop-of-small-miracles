@@ -2,6 +2,11 @@ import { expect, test } from '@playwright/test';
 
 test('is installable and works offline after the first load', async ({ page, context }) => {
 	await page.goto('/');
+	await expect(async () => {
+		const enter = page.getByRole('button', { name: /enter the shop/i });
+		if ((await enter.count()) > 0) await enter.click();
+		await expect(page.locator('.shop')).toBeVisible({ timeout: 1500 });
+	}).toPass({ timeout: 15_000 });
 	await expect(page.getByRole('heading', { name: /a shop of small miracles/i })).toBeVisible();
 
 	const manifestLink = page.locator('link[rel="manifest"]');

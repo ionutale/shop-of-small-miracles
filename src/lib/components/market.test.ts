@@ -31,6 +31,25 @@ function eveningSave(overrides: Parameters<typeof saveFixture>[0] = {}) {
 }
 
 describe('the evening market', () => {
+	it('announces a purchase and the coins left', async () => {
+		initGame(
+			42,
+			eveningSave({
+				coins: 20,
+				market: [{ elementId: 'H', units: 2, price: 3 }],
+				stock: []
+			})
+		);
+		const user = userEvent.setup();
+
+		render(MarketScreen);
+		await user.click(screen.getByTestId('buy-offer'));
+
+		expect(screen.getByTestId('market-announcer')).toHaveTextContent(
+			/bought hydrogen for 3 coins/i
+		);
+		expect(screen.getByTestId('market-announcer')).toHaveTextContent(/17 coins left/i);
+	});
 	it('shows eight offers and the shelf capacity', () => {
 		initGame(42, eveningSave());
 		render(MarketScreen);

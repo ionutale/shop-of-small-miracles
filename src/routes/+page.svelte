@@ -5,6 +5,8 @@
 	import RecipeBook from '../lib/components/RecipeBook.svelte';
 	import SettingsScreen from '../lib/components/SettingsScreen.svelte';
 	import ShopScreen from '../lib/components/ShopScreen.svelte';
+	import TitleScreen from '../lib/components/TitleScreen.svelte';
+	import { SAVE_KEY } from '../lib/game/storage';
 	import { game, initGame } from '../lib/stores/game';
 
 	type Tab = 'shop' | 'book' | 'journal' | 'settings';
@@ -17,6 +19,9 @@
 	];
 
 	let tab = $state<Tab>('shop');
+	let started = $state(
+		typeof localStorage !== 'undefined' && Boolean(localStorage.getItem(SAVE_KEY))
+	);
 
 	function openTab(next: Tab): void {
 		if (next === tab) return;
@@ -26,8 +31,15 @@
 	}
 
 	onMount(() => {
-		initGame();
+		if (started) initGame();
 	});
+
+	function enter(next: Tab): void {
+		initGame();
+		started = true;
+		tab = next;
+		window.scrollTo({ top: 0 });
+	}
 
 	$effect(() => {
 		if (typeof document === 'undefined') return;
@@ -35,31 +47,35 @@
 	});
 </script>
 
-<div class="screen" hidden={tab !== 'shop'}>
-	<ShopScreen />
-</div>
-<div class="screen" hidden={tab !== 'book'}>
-	<RecipeBook />
-</div>
-<div class="screen" hidden={tab !== 'journal'}>
-	<Journal />
-</div>
-<div class="screen" hidden={tab !== 'settings'}>
-	<SettingsScreen />
-</div>
+{#if started}
+	<div class="screen" hidden={tab !== 'shop'}>
+		<ShopScreen />
+	</div>
+	<div class="screen" hidden={tab !== 'book'}>
+		<RecipeBook />
+	</div>
+	<div class="screen" hidden={tab !== 'journal'}>
+		<Journal />
+	</div>
+	<div class="screen" hidden={tab !== 'settings'}>
+		<SettingsScreen />
+	</div>
 
-<nav class="tabs" aria-label="Shop pages">
-	{#each TABS as item (item.id)}
-		<button
-			type="button"
-			class:active={tab === item.id}
-			aria-current={tab === item.id ? 'page' : undefined}
-			onclick={() => openTab(item.id)}
-		>
-			{item.label}
-		</button>
-	{/each}
-</nav>
+	<nav class="tabs" aria-label="Shop pages">
+		{#each TABS as item (item.id)}
+			<button
+				type="button"
+				class:active={tab === item.id}
+				aria-current={tab === item.id ? 'page' : undefined}
+				onclick={() => openTab(item.id)}
+			>
+				{item.label}
+			</button>
+		{/each}
+	</nav>
+{:else}
+	<TitleScreen onStart={() => enter('shop')} onSettings={() => enter('settings')} />
+{/if}
 
 <style>
 	.tabs {

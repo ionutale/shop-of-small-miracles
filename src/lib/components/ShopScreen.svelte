@@ -173,60 +173,64 @@
 		{:else}
 			<section class="service" aria-label="Today’s service">
 				{#if visit && character}
-					<CustomerCard {visit} {character} onDecline={result ? undefined : handleDecline} />
+					<div class="guest">
+						<CustomerCard {visit} {character} onDecline={result ? undefined : handleDecline} />
 
-					{#if canSwap}
-						<button class="swap" type="button" onclick={handleSwap}>
-							Ask the ledger for another visitor
-						</button>
-					{/if}
-
-					{#if result}
-						<section class="result paper" data-testid="result">
-							<p class="hand verdict">
-								{result.kind === 'clean'
-									? 'A clean miracle'
-									: result.kind === 'sideEffect'
-										? 'A muddy miracle'
-										: 'A gentle no'}
-							</p>
-							<p class="line">{result.line}</p>
-
-							{#if result.pay > 0}
-								<p class="payment">Payment: {result.pay} coins</p>
-							{/if}
-							{#if result.reputationDelta > 0}
-								<p class="reputation">Reputation +{result.reputationDelta}.</p>
-							{:else if result.reputationDelta < 0}
-								<p class="reputation">Reputation −1.</p>
-							{:else if result.refunded}
-								<p class="reputation muted">The apprentice returned the ingredients.</p>
-							{:else if result.tags.length === 0}
-								<p class="reputation muted">Nothing was consumed.</p>
-							{:else}
-								<p class="reputation muted">The ingredients were spent.</p>
-							{/if}
-
-							{#if result.potionName}
-								<p class="filed">
-									Filed in the recipe book: <span class="hand">{result.potionName}</span>
-								</p>
-							{/if}
-
-							<button class="next" type="button" onclick={handleNext}>
-								{$game.servedToday >= VISITS_PER_DAY ? 'Evening' : 'Next visitor'}
+						{#if canSwap}
+							<button class="swap" type="button" onclick={handleSwap}>
+								Ask the ledger for another visitor
 							</button>
-						</section>
-					{:else}
-						<Cauldron {slots} onRemove={remove} />
-						<IngredientShelf entries={shelf} disabled={slots.length >= 3} onPick={pick} />
-						<BrewPreview
-							{preview}
-							potionName={namedPotion}
-							enabled={canBrewNow}
-							onBrew={handleBrew}
-						/>
-					{/if}
+						{/if}
+					</div>
+
+					<div class="craft">
+						{#if result}
+							<section class="result paper" data-testid="result">
+								<p class="hand verdict">
+									{result.kind === 'clean'
+										? 'A clean miracle'
+										: result.kind === 'sideEffect'
+											? 'A muddy miracle'
+											: 'A gentle no'}
+								</p>
+								<p class="line">{result.line}</p>
+
+								{#if result.pay > 0}
+									<p class="payment">Payment: {result.pay} coins</p>
+								{/if}
+								{#if result.reputationDelta > 0}
+									<p class="reputation">Reputation +{result.reputationDelta}.</p>
+								{:else if result.reputationDelta < 0}
+									<p class="reputation">Reputation −1.</p>
+								{:else if result.refunded}
+									<p class="reputation muted">The apprentice returned the ingredients.</p>
+								{:else if result.tags.length === 0}
+									<p class="reputation muted">Nothing was consumed.</p>
+								{:else}
+									<p class="reputation muted">The ingredients were spent.</p>
+								{/if}
+
+								{#if result.potionName}
+									<p class="filed">
+										Filed in the recipe book: <span class="hand">{result.potionName}</span>
+									</p>
+								{/if}
+
+								<button class="next" type="button" onclick={handleNext}>
+									{$game.servedToday >= VISITS_PER_DAY ? 'Evening' : 'Next visitor'}
+								</button>
+							</section>
+						{:else}
+							<Cauldron {slots} onRemove={remove} />
+							<IngredientShelf entries={shelf} disabled={slots.length >= 3} onPick={pick} />
+							<BrewPreview
+								{preview}
+								potionName={namedPotion}
+								enabled={canBrewNow}
+								onBrew={handleBrew}
+							/>
+						{/if}
+					</div>
 				{:else}
 					<section class="quiet paper" aria-labelledby="quiet-title">
 						<p class="hand quiet-kicker">the kettle, the dust, the last of the light</p>
@@ -531,6 +535,24 @@
 			padding: 0.2rem 0 0.2rem 1rem;
 			border-top: 0;
 			border-left: 1px solid rgba(59, 42, 26, 0.18);
+		}
+	}
+
+	@media (min-width: 980px) {
+		.shop {
+			max-width: 1080px;
+		}
+
+		.service {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+			gap: 1.6rem;
+			align-items: start;
+		}
+
+		.craft {
+			position: sticky;
+			top: 1.4rem;
 		}
 	}
 

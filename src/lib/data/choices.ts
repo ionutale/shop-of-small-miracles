@@ -124,6 +124,25 @@ export const CHOICES: readonly ChoiceRecord[] = [
 		]
 	},
 	{
+		id: 'day-15-chair',
+		day: 15,
+		prompt: 'The widow sits in the chair by the stove and does not speak for a long time.',
+		options: [
+			{
+				id: 'd15-sit-with-her',
+				label: 'Sit with her',
+				result: 'You sit until the kettle sings. She does not have to say anything.',
+				effects: { relationships: { widow: 2 } }
+			},
+			{
+				id: 'd15-let-her-be',
+				label: 'Let her have the quiet',
+				result: 'The shop settles around her. Some silences are company enough.',
+				effects: {}
+			}
+		]
+	},
+	{
 		id: 'day-16-road',
 		day: 16,
 		prompt:
@@ -172,7 +191,7 @@ export const CHOICES: readonly ChoiceRecord[] = [
 				id: 'd19-keep-chair',
 				label: 'Keep the chair by the stove',
 				result: 'You put a cushion on it. The corner looks less empty than it did.',
-				effects: { flags: ['keptTheChair'], relationships: { widow: 2, apprentice: 1 } }
+				effects: { flags: ['keptTheChair'], relationships: { widow: 3, apprentice: 1 } }
 			},
 			{
 				id: 'd19-store-chair',

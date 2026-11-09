@@ -148,7 +148,9 @@ export function buyUpgrade(save: SaveState, upgradeId: string): SaveState {
  * one shelf unit if there is nothing left to take. The shop always continues.
  */
 export function applyRentShortfall(save: SaveState): SaveState {
-	const owned = ownedUpgrades(save.upgrades).sort((a, b) => b.cost - a.cost);
+	const owned = ownedUpgrades(save.upgrades)
+		.filter((upgrade) => upgrade.id !== 'empty-chair')
+		.sort((a, b) => b.cost - a.cost);
 	let upgrades = [...save.upgrades];
 	let shelfCapacity = save.shelfCapacity;
 	let taken: string;

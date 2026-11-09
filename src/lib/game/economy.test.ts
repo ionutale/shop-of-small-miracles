@@ -184,6 +184,23 @@ describe('rent shortfalls', () => {
 		expect(after.phase).not.toBe('ending');
 	});
 
+	it('never confiscates the empty chair, even when it is the most expensive', () => {
+		const after = applyRentShortfall(
+			saveFixture({
+				day: 7,
+				chapter: 1,
+				phase: 'chapterEnd',
+				coins: 0,
+				reputation: 5,
+				upgrades: ['empty-chair', 'shelf'],
+				shelfCapacity: 40
+			})
+		);
+
+		expect(after.upgrades).toEqual(['empty-chair']);
+		expect(after.shelfCapacity).toBe(30);
+	});
+
 	it('takes a shelf unit when there is no upgrade and clamps reputation at zero', () => {
 		const after = applyRentShortfall(
 			saveFixture({

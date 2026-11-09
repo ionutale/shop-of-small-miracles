@@ -63,7 +63,7 @@ describe('validateContent', () => {
 		expect(VISITS).toHaveLength(63);
 		expect(CONTENT.upgrades).toHaveLength(12);
 		expect(CONTENT.endings).toHaveLength(3);
-		expect(CONTENT.choices).toHaveLength(10);
+		expect(CONTENT.choices).toHaveLength(11);
 	});
 
 	it('rejects duplicate choice options, duplicate choice days, and a wrong ending count', () => {

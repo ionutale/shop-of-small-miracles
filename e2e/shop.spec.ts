@@ -1,6 +1,14 @@
 import { expect, test } from '@playwright/test';
 import { SAVE_KEY, seededSave } from './fixtures';
 
+async function enterShop(page: import('@playwright/test').Page) {
+	await expect(async () => {
+		const enter = page.getByRole('button', { name: /enter the shop/i });
+		if ((await enter.count()) > 0) await enter.click();
+		await expect(page.locator('.shop')).toBeVisible({ timeout: 1500 });
+	}).toPass({ timeout: 15_000 });
+}
+
 async function reachEvening(page: import('@playwright/test').Page) {
 	for (let served = 1; served <= 3; served++) {
 		await page.getByRole('button', { name: /politely decline/i }).click();
@@ -15,6 +23,7 @@ test('serves the first customer by tap in under a minute and restores the shop a
 	const started = Date.now();
 
 	await page.goto('/');
+	await enterShop(page);
 
 	await expect(page.getByRole('heading', { name: /a shop of small miracles/i })).toBeVisible();
 	await expect(page.locator('.shop')).toHaveAttribute('data-phase', 'service');
@@ -65,6 +74,7 @@ test('serves the first customer by tap in under a minute and restores the shop a
 
 test('a mismatched brew spends the ingredients and leaves reputation alone', async ({ page }) => {
 	await page.goto('/');
+	await enterShop(page);
 
 	await page.getByRole('button', { name: /hydrogen/i }).click();
 	await page.getByRole('button', { name: /oxygen/i }).click();
@@ -83,6 +93,7 @@ test('a mismatched brew spends the ingredients and leaves reputation alone', asy
 
 test('politely declining costs nothing', async ({ page }) => {
 	await page.goto('/');
+	await enterShop(page);
 
 	await page.getByRole('button', { name: /politely decline/i }).click();
 
@@ -99,6 +110,7 @@ test('serves exactly three visitors, reaches the evening, and opens the next day
 	page
 }) => {
 	await page.goto('/');
+	await enterShop(page);
 
 	for (let served = 1; served <= 3; served++) {
 		await expect(page.getByTestId('visitor-count')).toContainText(`${served} of 3`);
@@ -158,6 +170,7 @@ test('an empty shelf becomes a quiet day with no penalty and still reaches eveni
 	);
 
 	await page.goto('/');
+	await enterShop(page);
 	await expect(page.getByText(/the shop is quiet/i)).toBeVisible();
 	await expect(page.getByText(/5 \/ 10/)).toBeVisible();
 	await expect(page.getByRole('button', { name: /^evening$/i })).toBeVisible();
@@ -173,6 +186,7 @@ test('an empty shelf becomes a quiet day with no penalty and still reaches eveni
 
 test('buys evening stock and keeps the same market after reload', async ({ page }) => {
 	await page.goto('/');
+	await enterShop(page);
 	await reachEvening(page);
 
 	await expect(page.getByTestId('market-offer')).toHaveCount(8);
@@ -193,6 +207,7 @@ test('buys evening stock and keeps the same market after reload', async ({ page 
 
 test('allows exactly one upgrade in an evening and remembers it', async ({ page }) => {
 	await page.goto('/');
+	await enterShop(page);
 	await reachEvening(page);
 
 	await page.getByRole('button', { name: /buy upgrade — the market ledger/i }).click();
@@ -217,6 +232,7 @@ test('pays the rent on day seven and opens chapter two', async ({ page }) => {
 		]
 	);
 	await page.goto('/');
+	await enterShop(page);
 
 	await expect(page.getByTestId('evening')).toBeVisible();
 	await page.getByRole('button', { name: /close up the shop/i }).click();
@@ -252,6 +268,7 @@ test('a rent shortfall names what was taken and the shop continues', async ({ pa
 		]
 	);
 	await page.goto('/');
+	await enterShop(page);
 
 	await page.getByRole('button', { name: /close up the shop/i }).click();
 	await expect(page.getByText(/40 coins short/i)).toBeVisible();
@@ -275,6 +292,7 @@ test('a double-click on reset does not clear the shop', async ({ page }) => {
 		[SAVE_KEY, JSON.stringify(seededSave({ day: 9, activeVisitId: 'widow-lamp' }))]
 	);
 	await page.goto('/');
+	await enterShop(page);
 
 	await page.getByRole('button', { name: /^settings$/i }).click();
 	await page.getByRole('button', { name: /reset all progress/i }).dblclick();

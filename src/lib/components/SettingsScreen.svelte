@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import { showModal } from '../actions/showModal';
 	import { trapFocus } from '../actions/trapFocus';
 	import { playSound } from '../game/sound';
 	import { appInstalled, installPrompt } from '../stores/install';
@@ -20,28 +21,6 @@
 		confirming = false;
 		await tick();
 		resetTrigger?.focus();
-	}
-
-	function showModal(node: HTMLDialogElement): { destroy: () => void } {
-		if (typeof node.showModal === 'function') {
-			try {
-				node.showModal();
-			} catch {
-				node.setAttribute('open', '');
-			}
-		} else {
-			node.setAttribute('open', '');
-		}
-		node.querySelector<HTMLElement>('button')?.focus();
-		return {
-			destroy() {
-				try {
-					node.close();
-				} catch {
-					// Already closed by the browser.
-				}
-			}
-		};
 	}
 
 	async function cancelReset(): Promise<void> {

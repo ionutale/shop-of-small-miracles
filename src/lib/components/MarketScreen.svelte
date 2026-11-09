@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { rentDueOn, TOTAL_DAYS } from '../data/chapters';
+	import { get } from 'svelte/store';
 	import { ELEMENT_BY_ID } from '../data/elements';
 	import { UPGRADES } from '../data/upgrades';
 	import { offerPrice, shelfUnits } from '../game/economy';
 	import { advanceDay, buyMarketOffer, game, purchaseUpgrade } from '../stores/game';
 	import UpgradeCard from './UpgradeCard.svelte';
 
+	let notice = $state('');
 	const shelfTotal = $derived(shelfUnits($game.stock));
 	const rentDue = $derived(rentDueOn($game.day));
 	const lastDay = $derived($game.day >= TOTAL_DAYS);
@@ -19,7 +21,14 @@
 	);
 
 	function buy(index: number): void {
+		const offer = $game.market[index];
+		const element = offer ? ELEMENT_BY_ID.get(offer.elementId) : null;
+		const before = get(game).coins;
 		buyMarketOffer(index);
+		const after = get(game);
+		if (element && after.coins < before) {
+			notice = `Bought ${element.name} for ${before - after.coins} coins. ${after.coins} coins left.`;
+		}
 	}
 
 	function closeShop(): void {
@@ -28,6 +37,9 @@
 </script>
 
 <section class="evening" data-testid="evening" aria-labelledby="evening-title">
+	<p class="visually-hidden" role="status" aria-live="polite" data-testid="market-announcer">
+		{notice}
+	</p>
 	<p class="hand kicker">the lamps are lit; the street fills with stalls</p>
 	<h2 id="evening-title">Evening</h2>
 
