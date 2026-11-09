@@ -68,6 +68,22 @@ describe('morning scene', () => {
 		expect(screen.queryByText(/lost a wheel outside your door/i)).not.toBeInTheDocument();
 	});
 
+	it('shows a one-time setback branch after a missed rent', async () => {
+		initGame(
+			42,
+			saveFixture({ day: 9, chapter: 2, morningSeenDay: 0, setbacks: 1, flags: ['rentMissed'] })
+		);
+		const user = userEvent.setup();
+
+		render(MorningScene);
+
+		expect(screen.getByText(/lighter than it was/i)).toBeInTheDocument();
+
+		await user.click(screen.getByRole('button', { name: /^begin the day$/i }));
+
+		expect(get(game).flags).toContain('setbackTold');
+	});
+
 	it('does not let a chosen result hide the next choice day', async () => {
 		initGame(42, saveFixture({ day: 3, morningSeenDay: 0 }));
 		const user = userEvent.setup();
@@ -164,7 +180,12 @@ describe('ending page', () => {
 
 		render(EndingPage);
 
-		await user.click(screen.getByRole('button', { name: /new game/i }));
+		await user.click(screen.getByRole('button', { name: /^new game$/i }));
+
+		expect(get(game).day).toBe(21);
+		expect(screen.getByRole('button', { name: /yes, start over/i })).toBeInTheDocument();
+
+		await user.click(screen.getByRole('button', { name: /yes, start over/i }));
 
 		expect(get(game).day).toBe(1);
 		expect(get(game).phase).toBe('service');

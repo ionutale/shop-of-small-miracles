@@ -3,6 +3,7 @@
 	import { characterById, visitById } from '../data/characters';
 	import { ELEMENTS } from '../data/elements';
 	import { namePotion } from '../data/potions';
+	import { ownedUpgrades } from '../data/upgrades';
 	import { brewTags, judgeBrew } from '../game/brew';
 	import { playSound } from '../game/sound';
 	import {
@@ -43,7 +44,7 @@
 	const preview = $derived.by(() => {
 		if (!visit || slots.length !== 3) return null;
 		const brewed = brewTags(slots, ELEMENTS);
-		return judgeBrew(brewed, visit, $game.reputation, []);
+		return judgeBrew(brewed, visit, $game.reputation, ownedUpgrades($game.upgrades));
 	});
 	const canBrewNow = $derived(slots.length === 3);
 	const namedPotion = $derived(
@@ -149,7 +150,9 @@
 			</div>
 		</header>
 
-		<MorningScene />
+		{#if !$game.rentOutcome}
+			<MorningScene />
+		{/if}
 
 		{#if $game.rentOutcome}
 			<RentScene />

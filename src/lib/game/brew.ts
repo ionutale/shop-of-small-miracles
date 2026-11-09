@@ -95,7 +95,7 @@ export function judgeBrew(
 			pay: 0,
 			reputationDelta: 0,
 			line: visit.declineLine,
-			potionName: null
+			potionName: namePotion(result.tags)
 		};
 	}
 

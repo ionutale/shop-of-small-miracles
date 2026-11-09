@@ -78,7 +78,9 @@ describe('game store', () => {
 		expect(stockOf('H')).toBe(1);
 		expect(stockOf('O')).toBe(0);
 		expect(stockOf('Ag')).toBe(0);
-		expect(after.discovered).toEqual([]);
+		expect(after.discovered.map((potion) => potion.name)).toEqual([
+			'a light, bright, still draught'
+		]);
 	});
 
 	it('politely declining consumes nothing', () => {

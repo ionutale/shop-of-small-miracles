@@ -66,6 +66,18 @@ describe('shop', () => {
 		expect(state.discovered).toHaveLength(1);
 	});
 
+	it('previews the exact upgraded pay when upgrades are owned', async () => {
+		initGame(42, serviceSave({ upgrades: ['brass-scales', 'old-sign'] }));
+		const user = userEvent.setup();
+		render(ShopScreen);
+
+		await user.click(screen.getByRole('button', { name: /hydrogen/i }));
+		await user.click(screen.getByRole('button', { name: /sodium/i }));
+		await user.click(screen.getByRole('button', { name: /copper/i }));
+
+		expect(screen.getByText(/a clean brew pays 29 coins/i)).toBeInTheDocument();
+	});
+
 	it('announces the brew result and payment in one polite live region', async () => {
 		const user = userEvent.setup();
 		render(ShopScreen);

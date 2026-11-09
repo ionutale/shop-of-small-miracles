@@ -91,17 +91,16 @@ export function brew(ids: readonly string[]): void {
 
 	const key = potionKey(outcome.tags);
 	const alreadyFiled = current.discovered.some((potion) => potionKey(potion.tags) === key);
-	const discovered =
-		outcome.kind === 'decline' || alreadyFiled
-			? current.discovered
-			: [
-					...current.discovered,
-					{
-						tags: outcome.tags,
-						name: outcome.potionName ?? namePotion(outcome.tags),
-						day: current.day
-					}
-				];
+	const discovered = alreadyFiled
+		? current.discovered
+		: [
+				...current.discovered,
+				{
+					tags: outcome.tags,
+					name: outcome.potionName ?? namePotion(outcome.tags),
+					day: current.day
+				}
+			];
 
 	game.set({
 		...current,
@@ -259,19 +258,26 @@ export function leaveRentScene(): void {
 	game.set(continueAfterRentState(get(game)));
 }
 
+function withSetbackStory(state: SaveState): SaveState {
+	if (state.setbacks > 0 && !state.flags.includes('setbackTold')) {
+		return { ...state, flags: [...state.flags, 'setbackTold'] };
+	}
+	return state;
+}
+
 /** Takes an authored morning option; the card stays until Begin the day. */
 export function chooseStoryOption(optionId: string): void {
 	const current = get(game);
 	const next = applyChoice(current, optionId);
 	if (next === current) return;
-	game.set(next);
+	game.set(withSetbackStory(next));
 }
 
 /** Opens the day without taking a choice, when the day has no authored one. */
 export function dismissMorning(): void {
 	const current = get(game);
 	if (current.morningSeenDay >= current.day) return;
-	game.set({ ...current, morningSeenDay: current.day });
+	game.set(withSetbackStory({ ...current, morningSeenDay: current.day }));
 }
 
 /** Start over from day one but keep the player's comfort settings. */

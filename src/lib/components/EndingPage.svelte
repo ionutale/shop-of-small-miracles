@@ -9,6 +9,7 @@
 	const ARCS: readonly ArcId[] = ['widow', 'merchant', 'apprentice'];
 
 	let heading = $state<HTMLHeadingElement | undefined>();
+	let confirming = $state(false);
 
 	const ending = $derived(selectEnding($game));
 	const cast = $derived(
@@ -60,7 +61,21 @@
 		</ul>
 	{/if}
 
-	<button class="new-game" type="button" onclick={() => resetGame()}>New game</button>
+	{#if confirming}
+		<p class="confirm-note">
+			Start again from day one? The shop, the book, and the journal will be cleared.
+		</p>
+		<div class="confirm-actions">
+			<button class="new-game quiet" type="button" onclick={() => (confirming = false)}>
+				Keep this ending
+			</button>
+			<button class="new-game danger" type="button" onclick={() => resetGame()}>
+				Yes, start over
+			</button>
+		</div>
+	{:else}
+		<button class="new-game" type="button" onclick={() => (confirming = true)}>New game</button>
+	{/if}
 </article>
 
 <style>
@@ -148,6 +163,27 @@
 	.hint {
 		color: var(--ink-soft);
 		line-height: 1.4;
+	}
+
+	.confirm-note {
+		margin: 0 0 0.55rem;
+		color: var(--ink-soft);
+		font-size: 0.95rem;
+		line-height: 1.45;
+	}
+
+	.confirm-actions {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.new-game.quiet {
+		border-style: dashed;
+	}
+
+	.new-game.danger {
+		border-color: rgba(110, 47, 58, 0.5);
+		color: var(--burgundy);
 	}
 
 	.new-game {

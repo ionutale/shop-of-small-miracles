@@ -153,7 +153,9 @@ test('reaches the ending with the keyboard and reads it', async ({ page }) => {
 
 	await expect(page.getByRole('heading', { name: /the shop endures/i })).toBeFocused();
 
-	await tabTo(page, /new game/i);
+	await tabTo(page, /^new game$/i);
+	await page.keyboard.press('Enter');
+	await tabTo(page, /yes, start over/i);
 	await page.keyboard.press('Enter');
 
 	await expect(page.getByRole('heading', { name: /a shop of small miracles/i })).toBeVisible();

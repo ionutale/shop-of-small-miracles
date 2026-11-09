@@ -31,6 +31,13 @@
 		<p class="hand beat-kicker">{chapter.title}</p>
 		<p class="beat-text">{beat}</p>
 
+		{#if $game.setbacks > 0 && !$game.flags.includes('setbackTold')}
+			<p class="setback-note">
+				The landlord’s man has been and gone. The shop is lighter than it was, but the door still
+				opens.
+			</p>
+		{/if}
+
 		{#if chosen}
 			{#if chosenResult}
 				<p class="result" role="status">{chosenResult}</p>
@@ -81,6 +88,15 @@
 		font-size: 0.98rem;
 		line-height: 1.4;
 		color: var(--ink-soft);
+	}
+
+	.setback-note {
+		margin: 0.55rem 0 0;
+		padding-top: 0.5rem;
+		border-top: 1px dashed rgba(110, 47, 58, 0.4);
+		color: var(--burgundy);
+		font-size: 0.95rem;
+		line-height: 1.4;
 	}
 
 	.choice {
