@@ -12,6 +12,10 @@ test('is installable and works offline after the first load', async ({ page, con
 	).json();
 	const sizes = manifest.icons.map((icon: { sizes: string }) => icon.sizes);
 	expect(sizes).toEqual(expect.arrayContaining(['192x192', '512x512']));
+	expect(manifest.display).toBe('standalone');
+	expect(manifest.icons.some((icon: { purpose?: string }) => icon.purpose === 'maskable')).toBe(
+		true
+	);
 
 	await page.evaluate(async () => {
 		await navigator.serviceWorker.ready;
@@ -27,6 +31,7 @@ test('is installable and works offline after the first load', async ({ page, con
 	await context.setOffline(true);
 	await page.reload();
 	await expect(page.getByRole('heading', { name: /a shop of small miracles/i })).toBeVisible();
+	await expect(page.locator('.stat', { hasText: 'Day' })).toContainText('9');
 
 	const day = await page.evaluate(
 		(key) => JSON.parse(localStorage.getItem(key) ?? '{}').day,

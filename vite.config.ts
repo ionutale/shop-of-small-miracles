@@ -16,11 +16,7 @@ export default defineConfig({
 			},
 			{
 				registerType: 'prompt',
-				pwaAssets: {
-					preset: 'minimal-2023',
-					image: 'static/favicon.svg',
-					overrideManifestIcons: true
-				},
+				pwaAssets: { config: true },
 				manifest: {
 					name: 'A Shop of Small Miracles',
 					short_name: 'Small Miracles',
@@ -32,6 +28,8 @@ export default defineConfig({
 					start_url: '/',
 					scope: '/'
 				},
+				// The plugin adds a prerendered/** glob this SPA never produces;
+				// globStrict keeps the harmless warning from failing the build.
 				generateSW: {
 					globPatterns: ['client/**/*.{js,css,html,svg,png,ico,woff2}'],
 					globStrict: false,

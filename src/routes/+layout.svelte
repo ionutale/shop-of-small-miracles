@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import '@fontsource/cormorant-garamond/400.css';
 	import '@fontsource/cormorant-garamond/600.css';
 	import '@fontsource/cormorant-garamond/700.css';
@@ -7,9 +8,12 @@
 	import '../lib/styles/base.css';
 	import '../lib/styles/paper.css';
 	import PwaUpdate from '../lib/components/PwaUpdate.svelte';
+	import { captureInstallPrompt } from '../lib/stores/install';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+
+	onMount(() => captureInstallPrompt());
 </script>
 
 <svelte:head>

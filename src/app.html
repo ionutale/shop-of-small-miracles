@@ -8,6 +8,18 @@
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+		<script>
+			// Chrome fires this once, very early, before Svelte mounts.
+			window.__deferredInstallPrompt = null;
+			window.addEventListener('beforeinstallprompt', (event) => {
+				event.preventDefault();
+				window.__deferredInstallPrompt = event;
+				window.dispatchEvent(new Event('shop-install-available'));
+			});
+			window.addEventListener('appinstalled', () => {
+				window.__deferredInstallPrompt = null;
+			});
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

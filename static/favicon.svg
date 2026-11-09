@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="A candle beside a mortar">
-	<rect width="64" height="64" rx="14" fill="#F0E2C4" />
+	<rect width="64" height="64" fill="#F0E2C4" />
 	<path d="M6 17c6-3 11 1 16-1s9-3 15-1 11 1 21-1" fill="none" stroke="#B08A4F" stroke-width="1.4" stroke-linecap="round" opacity="0.5" />
 	<path d="M32 9c3 4 4.5 6 4.5 8.2a4.5 4.5 0 0 1-9 0C27.5 15 29 13 32 9Z" fill="#E8B86A" stroke="#6E2F3A" stroke-width="1.4" stroke-linejoin="round" />
 	<rect x="29.6" y="19" width="4.8" height="16" rx="1.6" fill="#FBF3DF" stroke="#3B2A1A" stroke-width="1.4" />

@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { playSound } from '../game/sound';
-	import { installPrompt } from '../stores/install';
+	import { appInstalled, installPrompt } from '../stores/install';
 	import { game, resetGame, setReduceMotion, setSound } from '../stores/game';
 	import ScreenShell from './ScreenShell.svelte';
 
 	let confirming = $state(false);
+	let installedNow = $state(false);
 	let installed = $derived(
 		typeof window !== 'undefined' &&
 			typeof window.matchMedia === 'function' &&
@@ -24,9 +25,15 @@
 	async function install(): Promise<void> {
 		const prompt = $installPrompt;
 		if (!prompt) return;
-		await prompt.prompt();
-		await prompt.userChoice;
-		installPrompt.set(null);
+		try {
+			await prompt.prompt();
+			await prompt.userChoice;
+			installedNow = true;
+		} catch {
+			// The browser may decline; the button simply disappears.
+		} finally {
+			installPrompt.set(null);
+		}
 	}
 </script>
 
@@ -67,7 +74,7 @@
 
 	<section class="block" aria-labelledby="install-title">
 		<h2 id="install-title">Keep the shop close</h2>
-		{#if installed}
+		{#if installed || $appInstalled || installedNow}
 			<p>This shop is already installed. It will open without a browser bar and work offline.</p>
 		{:else}
 			<p>
