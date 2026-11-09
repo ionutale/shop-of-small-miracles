@@ -140,7 +140,7 @@
 
 	.kicker {
 		margin: 0 0 0.2rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.15rem;
 		line-height: 1;
 	}
@@ -182,7 +182,7 @@
 
 	.section-head .hand {
 		margin: 0;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.02rem;
 		line-height: 1;
 	}
@@ -280,7 +280,7 @@
 	.empty {
 		padding: 0.5rem 0;
 		font-size: 0.9rem;
-		opacity: 0.85;
+		color: var(--ink-soft);
 	}
 
 	.rent-warning {
@@ -310,7 +310,7 @@
 		margin: 0.55rem 0 0;
 		font-family: 'Caveat', cursive;
 		font-size: 1.2rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		text-align: center;
 	}
 

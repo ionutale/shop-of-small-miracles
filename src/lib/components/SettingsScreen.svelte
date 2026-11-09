@@ -22,6 +22,28 @@
 		resetTrigger?.focus();
 	}
 
+	function showModal(node: HTMLDialogElement): { destroy: () => void } {
+		if (typeof node.showModal === 'function') {
+			try {
+				node.showModal();
+			} catch {
+				node.setAttribute('open', '');
+			}
+		} else {
+			node.setAttribute('open', '');
+		}
+		node.querySelector<HTMLElement>('button')?.focus();
+		return {
+			destroy() {
+				try {
+					node.close();
+				} catch {
+					// Already closed by the browser.
+				}
+			}
+		};
+	}
+
 	async function cancelReset(): Promise<void> {
 		confirming = false;
 		await tick();
@@ -102,26 +124,30 @@
 	<section class="block" aria-labelledby="progress-title">
 		<h2 id="progress-title">Progress</h2>
 		{#if confirming}
-			<div class="backdrop">
-				<div
-					class="dialog paper"
-					role="dialog"
-					aria-modal="true"
-					aria-labelledby="reset-title"
-					aria-describedby="reset-note"
-					use:trapFocus={{ onEscape: cancelReset }}
-				>
-					<h3 id="reset-title">Reset all progress?</h3>
-					<p id="reset-note">
-						This clears the save, the recipe book, every choice, and the ledger. It cannot be
-						undone.
-					</p>
-					<div class="actions">
-						<button class="quiet" type="button" onclick={cancelReset}>Keep my shop</button>
-						<button class="danger" type="button" onclick={clearShop}>Yes, clear the shop</button>
-					</div>
+			<dialog
+				class="dialog paper"
+				aria-modal="true"
+				aria-labelledby="reset-title"
+				aria-describedby="reset-note"
+				use:showModal
+				use:trapFocus={{ onEscape: cancelReset }}
+				oncancel={(event) => {
+					event.preventDefault();
+					cancelReset();
+				}}
+				onclick={(event) => {
+					if (event.target === event.currentTarget) cancelReset();
+				}}
+			>
+				<h3 id="reset-title">Reset all progress?</h3>
+				<p id="reset-note">
+					This clears the save, the recipe book, every choice, and the ledger. It cannot be undone.
+				</p>
+				<div class="actions">
+					<button class="quiet" type="button" onclick={cancelReset}>Keep my shop</button>
+					<button class="danger" type="button" onclick={clearShop}>Yes, clear the shop</button>
 				</div>
-			</div>
+			</dialog>
 		{:else}
 			<p>Start again from a single hydrogen atom and an empty ledger.</p>
 			<button
@@ -164,26 +190,19 @@
 		font-size: 1.3rem;
 	}
 
-	.backdrop {
-		position: fixed;
-		z-index: 40;
-		inset: 0;
-		display: grid;
-		place-items: center;
-		padding: 1rem;
-		background: rgba(36, 26, 18, 0.55);
-	}
-
 	.dialog {
-		width: min(100%, 28rem);
+		width: min(calc(100% - 2rem), 28rem);
+		max-width: 28rem;
+		margin: auto;
 		padding: 1.2rem 1.1rem;
 		border: 1px solid rgba(59, 42, 26, 0.3);
 		border-radius: 6px 18px 8px 15px;
+		background: var(--parchment);
+		color: var(--ink);
 	}
 
-	.dialog:focus-visible {
-		outline: 3px solid var(--burgundy);
-		outline-offset: 4px;
+	.dialog::backdrop {
+		background: rgba(36, 26, 18, 0.55);
 	}
 
 	p {

@@ -11,7 +11,7 @@
 </script>
 
 <div class="cauldron-block">
-	<div class="cauldron" aria-label="Cauldron">
+	<div class="cauldron" role="group" aria-label="Cauldron">
 		<span class="steam" class:active={slots.length > 0} aria-hidden="true">
 			<span></span><span></span><span></span>
 		</span>
@@ -100,7 +100,7 @@
 
 	.empty-mark {
 		font-size: 1.4rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		line-height: 1;
 	}
 
@@ -108,14 +108,13 @@
 		font-size: 0.58rem;
 		letter-spacing: 0.04em;
 		color: var(--ink-soft);
-		opacity: 0.8;
 	}
 
 	.cauldron-note {
 		margin: 0.4rem 0 0;
 		text-align: center;
 		font-size: 1.06rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 	}
 
 	.steam {

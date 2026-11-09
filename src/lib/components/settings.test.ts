@@ -104,10 +104,19 @@ describe('settings', () => {
 		await user.tab();
 		expect(keep).toHaveFocus();
 
+		await user.tab({ shift: true });
+		expect(confirm).toHaveFocus();
+
 		await user.keyboard('{Escape}');
 		await tick();
 
 		expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /reset all progress/i })).toHaveFocus();
+
+		await user.click(screen.getByRole('button', { name: /reset all progress/i }));
+		await user.click(screen.getByRole('button', { name: /keep my shop/i }));
+		await tick();
+
 		expect(screen.getByRole('button', { name: /reset all progress/i })).toHaveFocus();
 	});
 

@@ -24,7 +24,7 @@
 		<h2 id="customer-name">{character?.name ?? 'A stranger'}</h2>
 		<p class="request" data-testid="customer-request">{visit.request}</p>
 
-		<div class="tags" aria-label="Requested essences">
+		<div class="tags" role="group" aria-label="Requested essences">
 			{#each visit.tags as tag (tag)}
 				<TagChip {tag} />
 			{/each}
@@ -61,7 +61,7 @@
 
 	.eyebrow {
 		margin: 0 0 0.1rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.12rem;
 		line-height: 1;
 	}

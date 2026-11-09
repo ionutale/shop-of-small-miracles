@@ -115,7 +115,6 @@
 
 	.muted {
 		color: var(--ink-soft);
-		opacity: 0.75;
 	}
 
 	.brew {

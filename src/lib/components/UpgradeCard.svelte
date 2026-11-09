@@ -52,7 +52,7 @@
 
 	.price {
 		margin: 0;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.15rem;
 		line-height: 1;
 	}

@@ -71,7 +71,7 @@
 
 	.beat-kicker {
 		margin: 0 0 0.1rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.15rem;
 		line-height: 1.1;
 	}

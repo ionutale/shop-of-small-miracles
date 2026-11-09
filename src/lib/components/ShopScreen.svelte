@@ -54,7 +54,7 @@
 		let text = result.line;
 		if (result.pay > 0) text += ` Payment: ${result.pay} coins.`;
 		if (result.reputationDelta > 0) text += ' Reputation up.';
-		if (result.refunded) text += ' The apprentice returned the ingredients.';
+		if (result.reputationDelta < 0) text += ' Reputation down.';
 		return text;
 	});
 	const showingEnding = $derived(
@@ -118,7 +118,7 @@
 		<header class="masthead">
 			<p class="hand kicker">at the edge of a cold town, a small light is kept</p>
 			<h1 id="shop-title" tabindex="-1">A Shop of Small Miracles</h1>
-			<div class="status" aria-label="Shop status">
+			<div class="status" role="group" aria-label="Shop status">
 				<p class="stat"><span>Day</span> <strong>{$game.day}</strong></p>
 				<p class="stat"><span>Chapter</span> <strong>{chapter.number}</strong></p>
 				{#if !showingEnding}
@@ -313,7 +313,7 @@
 
 	.kicker {
 		margin: 0 0 0.15rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.2rem;
 		line-height: 1.1;
 	}
@@ -395,7 +395,7 @@
 	}
 
 	.muted {
-		opacity: 0.78;
+		color: var(--ink-soft);
 	}
 
 	.next {
@@ -449,7 +449,7 @@
 
 	.quiet-kicker {
 		margin: 0 0 0.25rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.12rem;
 		line-height: 1.1;
 	}

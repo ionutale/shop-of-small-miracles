@@ -101,7 +101,7 @@
 
 	.kicker {
 		margin: 0 0 0.2rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.12rem;
 		line-height: 1.1;
 	}

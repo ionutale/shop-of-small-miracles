@@ -143,7 +143,7 @@
 	}
 
 	.day {
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 0.8rem;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
@@ -193,7 +193,7 @@
 
 	.letter-day {
 		margin: 0;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 0.78rem;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;

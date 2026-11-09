@@ -59,7 +59,7 @@
 	}
 
 	.shelf-head p {
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1rem;
 		line-height: 1;
 	}
@@ -123,7 +123,6 @@
 		font-size: 0.62rem;
 		letter-spacing: 0.05em;
 		color: var(--ink-soft);
-		opacity: 0.8;
 	}
 
 	@media (min-width: 620px) {

@@ -21,7 +21,7 @@
 	async function leave(): Promise<void> {
 		leaveRentScene();
 		await tick();
-		document.getElementById('shop-title')?.focus();
+		if ($game.phase !== 'ending') document.getElementById('shop-title')?.focus();
 	}
 </script>
 
@@ -77,7 +77,7 @@
 
 	.kicker {
 		margin: 0 0 0.25rem;
-		color: var(--brass);
+		color: var(--brass-ink);
 		font-size: 1.14rem;
 		line-height: 1;
 	}
@@ -116,7 +116,7 @@
 
 	.soft {
 		font-size: 0.9rem;
-		opacity: 0.85;
+		color: var(--ink-soft);
 	}
 
 	.stats {
