@@ -103,6 +103,23 @@ describe('shop', () => {
 		expect(screen.getByTestId('announcer')).toHaveTextContent(/setback|shelf/i);
 	});
 
+	it('filters the shelf by essence and shows both essences on each card', async () => {
+		const user = userEvent.setup();
+		render(ShopScreen);
+
+		expect(screen.getByRole('button', { name: /^h hydrogen/i })).toHaveTextContent(/light/i);
+		expect(screen.getByRole('button', { name: /^c carbon/i })).toHaveTextContent(/ground · still/i);
+
+		await user.click(screen.getByRole('button', { name: 'Ground' }));
+
+		expect(screen.queryByRole('button', { name: /^h hydrogen/i })).not.toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /^c carbon/i })).toBeInTheDocument();
+
+		await user.click(screen.getByRole('button', { name: /all essences/i }));
+
+		expect(screen.getByRole('button', { name: /^h hydrogen/i })).toBeInTheDocument();
+	});
+
 	it('disables brewing until three ingredients are chosen and lets a slot be cleared', async () => {
 		const user = userEvent.setup();
 		render(ShopScreen);

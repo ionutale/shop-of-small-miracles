@@ -1,5 +1,7 @@
 <script lang="ts">
-	import type { ElementRecord } from '../types';
+	import { TAGS } from '../data/tags';
+	import type { ElementRecord, Tag } from '../types';
+	import TagIcon from './TagIcon.svelte';
 
 	let {
 		entries,
@@ -10,6 +12,16 @@
 		disabled?: boolean;
 		onPick: (elementId: string) => void;
 	} = $props();
+
+	let essence = $state<Tag | ''>('');
+
+	const visible = $derived(
+		essence === ''
+			? entries
+			: entries.filter(
+					({ element }) => element.primary === essence || element.secondary === essence
+				)
+	);
 </script>
 
 <section class="shelf" aria-labelledby="shelf-title">
@@ -18,8 +30,32 @@
 		<p class="hand">tap an essence to place it in the cauldron</p>
 	</div>
 
+	<div class="filters" role="group" aria-label="Filter the shelf by essence">
+		<button
+			type="button"
+			class="filter"
+			class:active={essence === ''}
+			aria-pressed={essence === ''}
+			onclick={() => (essence = '')}
+		>
+			All essences
+		</button>
+		{#each TAGS as tag (tag)}
+			<button
+				type="button"
+				class="filter"
+				class:active={essence === tag}
+				aria-pressed={essence === tag}
+				onclick={() => (essence = essence === tag ? '' : tag)}
+			>
+				<TagIcon {tag} size={14} />
+				{tag}
+			</button>
+		{/each}
+	</div>
+
 	<ul class="elements">
-		{#each entries as { element, units } (element.id)}
+		{#each visible as { element, units } (element.id)}
 			<li>
 				<button
 					type="button"
@@ -30,12 +66,16 @@
 				>
 					<span class="symbol">{element.symbol}</span>
 					<span class="name">{element.name}</span>
-					<span class="essence">{element.primary}</span>
+					<span class="essence">{element.primary} · {element.secondary}</span>
 					<span class="units">{units} left</span>
 				</button>
 			</li>
 		{/each}
 	</ul>
+
+	{#if visible.length === 0}
+		<p class="empty-shelf">No element on the shelf carries that essence yet.</p>
+	{/if}
 </section>
 
 <style>
@@ -62,6 +102,40 @@
 		color: var(--brass-ink);
 		font-size: 1rem;
 		line-height: 1;
+	}
+
+	.filters {
+		display: flex;
+		gap: 0.35rem;
+		margin: 0 0 0.55rem;
+		padding: 0 0 0.3rem;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+
+	.filter {
+		display: inline-flex;
+		min-height: 44px;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.35rem 0.65rem;
+		border: 1px solid rgba(59, 42, 26, 0.28);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.28);
+		color: var(--ink-soft);
+		font-size: 0.82rem;
+		white-space: nowrap;
+	}
+
+	.filter.active {
+		border-color: rgba(110, 47, 58, 0.55);
+		background: rgba(232, 184, 106, 0.28);
+		color: var(--burgundy);
+	}
+
+	.empty-shelf {
+		margin: 0.5rem 0 0;
+		color: var(--ink-soft);
 	}
 
 	.elements {

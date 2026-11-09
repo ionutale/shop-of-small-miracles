@@ -161,6 +161,29 @@
 		{/if}
 	</section>
 
+	<section class="block" aria-labelledby="help-title">
+		<h2 id="help-title">How the shop works</h2>
+		<dl class="help">
+			<dt>Essences</dt>
+			<dd>
+				Every element carries a primary essence. Three ingredients brew a potion from their distinct
+				primary essences; a doubled essence makes it potent.
+			</dd>
+			<dt>Clean brew</dt>
+			<dd>
+				A clean brew matches both requested essences, pays full, and raises reputation by one.
+			</dd>
+			<dt>Side effects</dt>
+			<dd>
+				An extra essence causes a side effect: less pay, a warning line, and a reputation wobble.
+			</dd>
+			<dt>Rent</dt>
+			<dd>Rent is due at the end of each chapter: days 7, 14, and 21.</dd>
+			<dt>Soft stakes</dt>
+			<dd>Missing rent is a setback, never a game over. The shop always opens again.</dd>
+		</dl>
+	</section>
+
 	<section class="block about" aria-labelledby="about-title">
 		<h2 id="about-title">About</h2>
 		<p>
@@ -266,6 +289,23 @@
 
 	button.quiet {
 		border-style: dashed;
+	}
+
+	.help {
+		display: grid;
+		gap: 0.55rem;
+		margin: 0;
+	}
+
+	.help dt {
+		font-weight: 600;
+		color: var(--ink);
+	}
+
+	.help dd {
+		margin: 0.1rem 0 0;
+		color: var(--ink-soft);
+		line-height: 1.45;
 	}
 
 	.note {

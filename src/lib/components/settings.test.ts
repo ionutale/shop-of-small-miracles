@@ -146,6 +146,18 @@ describe('settings', () => {
 		installPrompt.set(null);
 	});
 
+	it('explains the rules in a help section', () => {
+		initGame(42);
+
+		render(SettingsScreen);
+
+		expect(screen.getByRole('heading', { name: /how the shop works/i })).toBeInTheDocument();
+		expect(screen.getByText(/a clean brew matches both requested essences/i)).toBeInTheDocument();
+		expect(screen.getByText(/extra essence causes a side effect/i)).toBeInTheDocument();
+		expect(screen.getByText(/rent is due at the end of each chapter/i)).toBeInTheDocument();
+		expect(screen.getByText(/missing rent is a setback, never a game over/i)).toBeInTheDocument();
+	});
+
 	it('offers install guidance and an about note', () => {
 		initGame(42);
 
