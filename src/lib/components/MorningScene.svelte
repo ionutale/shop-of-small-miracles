@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import { choiceForOption } from '../data/choices';
 	import { beatForDay, chapterForDay } from '../data/chapters';
+	import { playSound } from '../game/sound';
 	import { morningChoices, morningDue } from '../game/story';
 	import { chooseStoryOption, dismissMorning, game } from '../stores/game';
 
@@ -19,6 +20,7 @@
 
 	async function choose(optionId: string): Promise<void> {
 		chooseStoryOption(optionId);
+		playSound('paper');
 		await tick();
 		beginButton?.focus();
 	}

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { TAG_GLYPHS } from '../data/tags';
 	import type { Tag } from '../types';
+	import TagIcon from './TagIcon.svelte';
 
 	let { tag, potent = false }: { tag: Tag; potent?: boolean } = $props();
 </script>
 
 <span class="tag" data-testid="tag-chip" class:potent>
-	<span class="glyph" aria-hidden="true">{TAG_GLYPHS[tag]}</span>
+	<span class="glyph"><TagIcon {tag} /></span>
 	<span class="label">{tag}</span>
 	{#if potent}<span class="potent-label">potent</span>{/if}
 </span>
@@ -28,8 +28,8 @@
 	}
 
 	.glyph {
+		display: inline-flex;
 		color: var(--burgundy);
-		font-size: 0.9rem;
 	}
 
 	.potent {

@@ -1,0 +1,112 @@
+/* Paper, candle, seals, and page motion shared by every screen. */
+
+.screen:not([hidden]) {
+	animation: page-turn 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes page-turn {
+	from {
+		opacity: 0;
+		transform: translateY(12px) rotateX(1.4deg);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) rotateX(0);
+	}
+}
+
+/* A torn, hand-cut paper edge. Applied sparingly to keep text legible. */
+.deckle {
+	clip-path: polygon(
+		0% 0.7%,
+		8% 0%,
+		20% 0.5%,
+		33% 0.1%,
+		47% 0.6%,
+		61% 0.1%,
+		75% 0.7%,
+		88% 0.1%,
+		100% 0.6%,
+		99.4% 16%,
+		100% 33%,
+		99.5% 50%,
+		100% 67%,
+		99.4% 84%,
+		100% 100%,
+		88% 99.4%,
+		75% 100%,
+		61% 99.5%,
+		47% 100%,
+		33% 99.4%,
+		20% 100%,
+		8% 99.5%,
+		0% 100%,
+		0.6% 84%,
+		0% 67%,
+		0.5% 50%,
+		0% 33%,
+		0.6% 16%
+	);
+}
+
+.wax-seal {
+	position: relative;
+	display: inline-flex;
+	width: 2rem;
+	height: 2rem;
+	align-items: center;
+	justify-content: center;
+	border-radius: 48% 52% 55% 45% / 52% 46% 54% 48%;
+	background:
+		radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.38), transparent 45%),
+		radial-gradient(circle at 60% 68%, #5c222c, var(--burgundy) 68%);
+	box-shadow:
+		inset 0 -2px 4px rgba(36, 20, 24, 0.45),
+		0 2px 5px rgba(59, 42, 26, 0.35);
+	color: rgba(255, 236, 214, 0.86);
+	font-family: 'Caveat', cursive;
+	font-size: 1.05rem;
+	flex: none;
+}
+
+.wax-seal::after {
+	content: 'M';
+	transform: rotate(-8deg);
+}
+
+/* Reduced motion: the setting class and the operating-system preference. */
+.reduce-motion .screen,
+.reduce-motion .flame,
+.reduce-motion .steam span {
+	animation: none !important;
+}
+
+.reduce-motion .steam {
+	display: none !important;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+	transition-duration: 0.01ms !important;
+	scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.screen,
+	.flame,
+	.steam span {
+		animation: none !important;
+	}
+
+	.steam {
+		display: none !important;
+	}
+
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}

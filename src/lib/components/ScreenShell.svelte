@@ -13,7 +13,10 @@
 	<main class="inner">
 		<header class="masthead">
 			<p class="hand kicker">{kicker}</p>
-			<h1>{title}</h1>
+			<div class="title-row">
+				<h1>{title}</h1>
+				<span class="wax-seal" aria-hidden="true"></span>
+			</div>
 		</header>
 
 		{@render children()}
@@ -88,6 +91,12 @@
 
 	.masthead {
 		margin-bottom: 1rem;
+	}
+
+	.title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
 	}
 
 	.kicker {

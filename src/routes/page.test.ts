@@ -21,6 +21,9 @@ describe('page', () => {
 
 		await userEvent.click(screen.getByRole('button', { name: /journal/i }));
 		expect(screen.getByRole('heading', { name: /the journal/i })).toBeInTheDocument();
+
+		await userEvent.click(screen.getByRole('button', { name: /settings/i }));
+		expect(screen.getByRole('heading', { name: /^settings$/i })).toBeInTheDocument();
 	});
 
 	it('resets the scroll position when another tab opens', async () => {

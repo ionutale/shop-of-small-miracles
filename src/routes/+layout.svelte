@@ -5,6 +5,7 @@
 	import '@fontsource/caveat/400.css';
 	import '@fontsource/caveat/700.css';
 	import '../lib/styles/base.css';
+	import '../lib/styles/paper.css';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();

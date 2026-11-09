@@ -68,7 +68,7 @@
 		<p class="note">{letters.length} of {LETTERS.length} letters received.</p>
 		<ul class="letter-list">
 			{#each letters as letter (letter.id)}
-				<li class="letter paper">
+				<li class="letter paper deckle">
 					<p class="letter-day">Left for day {letter.day}</p>
 					<h3 class="hand">{letter.title}</h3>
 					<p class="letter-body">{letter.body}</p>

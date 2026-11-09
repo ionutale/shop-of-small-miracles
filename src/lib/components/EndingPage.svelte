@@ -34,7 +34,8 @@
 	onMount(() => heading?.focus());
 </script>
 
-<article class="ending paper" data-testid="ending-page" aria-labelledby="ending-title">
+<article class="ending paper deckle" data-testid="ending-page" aria-labelledby="ending-title">
+	<span class="wax-seal ending-seal" aria-hidden="true"></span>
 	<p class="hand kicker">day {$game.day} · the last page</p>
 	<h2 id="ending-title" tabindex="-1" bind:this={heading}>{ending.title}</h2>
 	<p class="chose">The shop chose to be…</p>
@@ -70,6 +71,15 @@
 		border-radius: 6px 18px 8px 15px;
 		background:
 			linear-gradient(160deg, rgba(255, 255, 255, 0.32), transparent 55%), rgba(255, 255, 255, 0.14);
+	}
+
+	.ending-seal {
+		position: absolute;
+		top: 0.8rem;
+		right: 0.9rem;
+		width: 1.7rem;
+		height: 1.7rem;
+		font-size: 0.9rem;
 	}
 
 	.kicker {

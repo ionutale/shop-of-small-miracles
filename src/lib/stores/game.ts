@@ -15,6 +15,7 @@ import {
 } from '../game/day';
 import { pickVisit } from '../game/eligibility';
 import { applyChoice } from '../game/story';
+import { setSoundEnabled } from '../game/sound';
 import { createInitialSave, loadSave, saveGame, SAVE_KEY } from '../game/storage';
 
 export { SAVE_KEY };
@@ -25,6 +26,7 @@ export const recovered = writable(false);
 let ready = false;
 
 game.subscribe((state) => {
+	setSoundEnabled(state.settings.sound);
 	if (ready) saveGame(state);
 });
 
@@ -274,4 +276,15 @@ export function dismissMorning(): void {
 
 export function resetGame(seed = 42): void {
 	initGame(seed, createInitialSave(seed));
+}
+
+/** The two comfort settings; both autosave through the store subscription. */
+export function setSound(enabled: boolean): void {
+	const current = get(game);
+	game.set({ ...current, settings: { ...current.settings, sound: enabled } });
+}
+
+export function setReduceMotion(enabled: boolean): void {
+	const current = get(game);
+	game.set({ ...current, settings: { ...current.settings, reduceMotion: enabled } });
 }

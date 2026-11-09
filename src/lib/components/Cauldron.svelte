@@ -12,6 +12,9 @@
 
 <div class="cauldron-block">
 	<div class="cauldron" aria-label="Cauldron">
+		<span class="steam" class:active={slots.length > 0} aria-hidden="true">
+			<span></span><span></span><span></span>
+		</span>
 		{#each [0, 1, 2] as index (index)}
 			{@const id = slots[index]}
 			{@const element = id ? ELEMENT_BY_ID.get(id) : null}
@@ -116,5 +119,66 @@
 		text-align: center;
 		font-size: 1.06rem;
 		color: var(--brass);
+	}
+
+	.steam {
+		position: absolute;
+		top: -0.45rem;
+		left: 50%;
+		width: 2.6rem;
+		height: 1.5rem;
+		transform: translateX(-50%);
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 400ms ease;
+	}
+
+	.steam.active {
+		opacity: 1;
+	}
+
+	.steam span {
+		position: absolute;
+		bottom: 0;
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.55);
+		filter: blur(3px);
+		animation: curl 3.2s ease-in-out infinite;
+	}
+
+	.steam span:nth-child(2) {
+		left: 50%;
+		animation-delay: 0.8s;
+	}
+
+	.steam span:nth-child(3) {
+		right: 0;
+		animation-delay: 1.6s;
+	}
+
+	@keyframes curl {
+		0% {
+			transform: translateY(0) scale(0.6);
+			opacity: 0;
+		}
+		30% {
+			opacity: 0.7;
+		}
+		100% {
+			transform: translateY(-1.5rem) scale(1.15);
+			opacity: 0;
+		}
+	}
+
+	:global(.reduce-motion) .steam {
+		display: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.steam {
+			display: none;
+		}
 	}
 </style>

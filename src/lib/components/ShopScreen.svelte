@@ -4,6 +4,7 @@
 	import { ELEMENTS } from '../data/elements';
 	import { namePotion } from '../data/potions';
 	import { brewTags, judgeBrew } from '../game/brew';
+	import { playSound } from '../game/sound';
 	import { brew, decline, finishService, game, nextCustomer, swapCustomer } from '../stores/game';
 	import BrewPreview from './BrewPreview.svelte';
 	import Cauldron from './Cauldron.svelte';
@@ -66,16 +67,19 @@
 	function handleBrew(): void {
 		if (!canBrewNow) return;
 		brew(slots);
+		playSound($game.lastResult?.kind === 'clean' ? 'chime' : 'paper');
 		slots = [];
 	}
 
 	function handleDecline(): void {
 		decline();
+		playSound('paper');
 		slots = [];
 	}
 
 	function handleNext(): void {
 		nextCustomer();
+		playSound('paper');
 		slots = [];
 	}
 
