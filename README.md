@@ -24,6 +24,7 @@ pnpm build         # static build in build/
 pnpm preview       # serve the production build
 pnpm check:bundle  # 180 KB gzip budget for initial JS
 pnpm pwa:assets    # regenerate icons from static/favicon.svg
+pnpm deploy        # build and deploy to Cloudflare Workers
 ```
 
 `pnpm test:e2e` and `pnpm e2e` both run Playwright; the configured web server builds the app and serves the production preview itself. The suite covers the first customer, mid-day resume, rent setbacks, all three endings, the PWA/offline reload, keyboard-only play, 44 px targets, and axe audits of Shop, Market, Book, Journal, and Settings.
@@ -67,7 +68,14 @@ The icon config (parchment maskable/apple backgrounds) is in `pwa-assets.config.
 
 ## Deploy
 
-`pnpm build` writes a static site to `build/`. Serve that directory from any static host. The build contains `200.html` rather than `index.html`, so configure the host to rewrite `/` (and unknown routes) to `/200.html`; the service worker precaches `/` as the navigation shell, and a host that 404s `/` will break first install. No server, database, accounts, or API keys.
+The shop runs on Cloudflare Workers static assets. `pnpm deploy` builds the app, mirrors `200.html` to `index.html` (Workers serves `/` from `index.html`), and runs `wrangler deploy` with `wrangler.jsonc`.
+
+Live at:
+
+- https://shop-of-small-miracles.alexionutale.workers.dev
+- https://shop-of-small-miracles.aiu-media.com
+
+`wrangler.jsonc` sets `assets.not_found_handling: "single-page-application"`, so unknown routes fall back to the shell. The service worker precaches `/` as the navigation shell; a host without the SPA fallback would break first install. Any static host works the same way — serve `build/` and rewrite `/` to `200.html` (or `index.html` after the copy). No server, database, accounts, or API keys.
 
 ## Accessibility
 

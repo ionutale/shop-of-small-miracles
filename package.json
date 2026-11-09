@@ -9,7 +9,7 @@
 	},
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "vite build && node scripts/postbuild.mjs",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -21,6 +21,7 @@
 		"validate": "vite-node scripts/validate-content.ts",
 		"pwa:assets": "pwa-assets-generator",
 		"check:bundle": "node scripts/check-bundle.mjs",
+		"deploy": "pnpm build && wrangler deploy",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
@@ -53,7 +54,8 @@
 		"vite": "^8.3.0",
 		"vite-node": "^6.0.0",
 		"vite-plugin-pwa": "^2.0.0",
-		"vitest": "^4.1.8"
+		"vitest": "^4.1.8",
+		"wrangler": "^4.158.0"
 	},
 	"dependencies": {
 		"@fontsource/caveat": "^5.2.8",
