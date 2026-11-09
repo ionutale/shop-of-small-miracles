@@ -1,4 +1,5 @@
 import { namePotion } from '../data/potions';
+import { sideEffectLineFor } from '../data/sideEffects';
 import type {
 	BrewOutcome,
 	ElementRecord,
@@ -113,7 +114,10 @@ export function judgeBrew(
 		extras,
 		pay: Math.max(5, pay),
 		reputationDelta: kind === 'clean' ? 1 : -1,
-		line: kind === 'clean' ? visit.cleanLine : visit.sideEffectLine,
+		line:
+			kind === 'clean'
+				? visit.cleanLine
+				: [visit.sideEffectLine, ...extras.map((tag) => sideEffectLineFor(tag))].join(' '),
 		potionName: namePotion(result.tags)
 	};
 }

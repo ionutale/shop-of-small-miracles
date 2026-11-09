@@ -1,3 +1,4 @@
+import { SIDE_EFFECTS } from '../data/sideEffects';
 import { describe, expect, it } from 'vitest';
 import { ELEMENTS } from '../data/elements';
 import { tinyVisit } from '../test/fixtures';
@@ -81,6 +82,19 @@ describe('brew', () => {
 		expect(messy.reputationDelta).toBe(-1);
 		expect(declined.reputationDelta).toBe(0);
 		expect(declined.pay).toBe(0);
+	});
+
+	it('adds a side-effect line for every extra essence', () => {
+		const outcome = judgeBrew(
+			{ tags: ['Warm', 'Bright', 'Still'], potency: null },
+			tinyVisit(['Warm', 'Bright']),
+			5,
+			[]
+		);
+
+		expect(outcome.kind).toBe('sideEffect');
+		expect(outcome.extras).toEqual(['Still']);
+		expect(outcome.line).toContain(SIDE_EFFECTS.Still[0]);
 	});
 
 	it('names the potion a clean brew produces', () => {

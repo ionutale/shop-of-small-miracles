@@ -38,6 +38,7 @@ All content is typed data under `src/lib/data/` and validated by `pnpm validate`
 - **Elements** live in `elements.ts`: 30 records with a primary and secondary essence, a price, and a distinct pair. Only the primary essence brews.
 - **Essences** live in `tags.ts`: 18 tags. Every primary tag appears on the shelf; tags are always shown as text plus an inline icon, never colour alone.
 - **Potions** live in `potions.ts`: 24 named tag pairs with effect prose. Unknown pairs still brew and get a generated name in the recipe book's Unfiled section.
+- **Side effects** live in `sideEffects.ts`: one table per essence. Every extra essence in a brew adds its line to the customer's reaction.
 - **Customers** live in `characters.ts`: 30 characters and 63 visits. Each visit has request prose, exactly two desired tags, clean/side-effect/decline lines, and a chapter. Three recurring arcs have fixed days in `chapters.ts`.
 - **Chapters** live in `chapters.ts`: 21 days, 7-day chapters, rent on days 7/14/21, and a beat for every day.
 - **Upgrades** live in `upgrades.ts`: 12 upgrades, at most one bought per evening.

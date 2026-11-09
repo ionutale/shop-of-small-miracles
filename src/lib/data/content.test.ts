@@ -3,7 +3,16 @@ import { CHAPTERS, TOTAL_DAYS, beatForDay, chapterNumberForDay, rentDueOn } from
 import { CHARACTERS, VISITS } from './characters';
 import { ELEMENTS } from './elements';
 import { POTIONS } from './potions';
+import { SIDE_EFFECTS } from './sideEffects';
 import { TAGS } from './tags';
+
+describe('side effects', () => {
+	it('ships at least one line for every essence', () => {
+		for (const tag of TAGS) {
+			expect(SIDE_EFFECTS[tag].length, tag).toBeGreaterThan(0);
+		}
+	});
+});
 
 describe('tags', () => {
 	it('ships all eighteen essence tags', () => {
