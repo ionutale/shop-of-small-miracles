@@ -1,5 +1,7 @@
 # A Shop of Small Miracles
 
+[![CI](https://github.com/ionutale/shop-of-small-miracles/actions/workflows/ci.yml/badge.svg)](https://github.com/ionutale/shop-of-small-miracles/actions/workflows/ci.yml)
+
 A storybook shop sim about brewing small kindnesses for a cold town. Three primary essences go into the cauldron; customers ask for two tags without naming them; rent is real and none of the three endings is a failure. Mobile-first SvelteKit PWA, offline after the first load, local saves.
 
 ## Run it
