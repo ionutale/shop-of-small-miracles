@@ -66,6 +66,17 @@ pnpm pwa:assets
 
 The icon config (parchment maskable/apple backgrounds) is in `pwa-assets.config.ts`; rerun `pnpm pwa:assets` whenever `static/favicon.svg` changes.
 
+## CI
+
+GitHub Actions runs the full gate on every push and pull request: `validate`, `check`, `lint`, `test`, `build`, `check:bundle`, and `e2e` (Chromium). The workflow is `.github/workflows/ci.yml`.
+
+On a push to `master`, the deploy job runs when these repository secrets exist:
+
+- `CLOUDFLARE_API_TOKEN` — a token with **Workers Scripts: Edit** (and account read) for this account.
+- `CLOUDFLARE_ACCOUNT_ID` — `f4f10fe90a6523c4c7702edfe15e14cc`.
+
+Add them under **Settings → Secrets and variables → Actions**. Without them the deploy step is skipped and CI still verifies the app.
+
 ## Deploy
 
 The shop runs on Cloudflare Workers static assets. `pnpm deploy` builds the app, mirrors `200.html` to `index.html` (Workers serves `/` from `index.html`), and runs `wrangler deploy` with `wrangler.jsonc`.
