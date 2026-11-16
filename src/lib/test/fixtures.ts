@@ -53,7 +53,7 @@ export function saveFixture(overrides: Partial<SaveState> = {}): SaveState {
 		morningSeenDay: 0,
 		choices: [],
 		tutorialDone: true,
-		records: { cleanBrews: 0, served: 0, namedSeen: [], endings: [] },
+		records: { cleanBrews: 0, served: 0, namedSeen: [], endings: [], chairEndings: 0 },
 		badges: [],
 		...overrides
 	};

@@ -10,13 +10,15 @@ const EMPTY_RECORDS: SaveState['records'] = {
 	cleanBrews: 0,
 	served: 0,
 	namedSeen: [],
-	endings: []
+	endings: [],
+	chairEndings: 0
 };
 const SEEDED_RECORDS: SaveState['records'] = {
 	cleanBrews: 3,
 	served: 12,
 	namedSeen: ["Widow's Lamp"],
-	endings: ['quiet-closing']
+	endings: ['quiet-closing'],
+	chairEndings: 1
 };
 
 describe('storage', () => {
@@ -152,7 +154,8 @@ describe('storage', () => {
 				cleanBrews: -2,
 				served: 'many',
 				namedSeen: ["Widow's Lamp", 7],
-				endings: ['quiet-closing', 3]
+				endings: ['quiet-closing', 3],
+				chairEndings: -4
 			},
 			badges: [{ id: 'first-light', day: 2 }, { id: 5, day: 1 }, 'nope']
 		};
@@ -163,7 +166,8 @@ describe('storage', () => {
 			cleanBrews: 0,
 			served: 0,
 			namedSeen: ["Widow's Lamp"],
-			endings: ['quiet-closing']
+			endings: ['quiet-closing'],
+			chairEndings: 0
 		});
 		expect(parsed?.badges).toEqual([{ id: 'first-light', day: 2 }]);
 	});

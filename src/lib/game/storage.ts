@@ -60,7 +60,7 @@ export function createInitialSave(seed = 42): SaveState {
 		morningSeenDay: 0,
 		choices: [],
 		tutorialDone: false,
-		records: { cleanBrews: 0, served: 0, namedSeen: [], endings: [] },
+		records: { cleanBrews: 0, served: 0, namedSeen: [], endings: [], chairEndings: 0 },
 		badges: []
 	};
 
@@ -191,7 +191,8 @@ export function parseSave(raw: string | null): SaveState | null {
 			cleanBrews: nonNegativeCount(records.cleanBrews),
 			served: nonNegativeCount(records.served),
 			namedSeen: stringList(records.namedSeen),
-			endings: stringList(records.endings) as SaveState['records']['endings']
+			endings: stringList(records.endings) as SaveState['records']['endings'],
+			chairEndings: nonNegativeCount(records.chairEndings)
 		},
 		badges: badgeList(value.badges)
 	};

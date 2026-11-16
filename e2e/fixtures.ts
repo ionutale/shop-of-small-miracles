@@ -43,7 +43,7 @@ export function seededSave(overrides: Partial<SaveState> = {}): SaveState {
 		morningSeenDay: 21,
 		choices: [],
 		tutorialDone: true,
-		records: { cleanBrews: 0, served: 0, namedSeen: [], endings: [] },
+		records: { cleanBrews: 0, served: 0, namedSeen: [], endings: [], chairEndings: 0 },
 		badges: [],
 		...overrides
 	};

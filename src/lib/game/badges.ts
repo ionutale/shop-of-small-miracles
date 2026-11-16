@@ -29,7 +29,7 @@ const CONDITIONS: Record<BadgeId, (save: SaveState) => boolean> = {
 	'shop-endures': (save) => hasEnding(save, 'shop-endures'),
 	'last-miracle': (save) => hasEnding(save, 'last-miracle'),
 	'quiet-closing': (save) => hasEnding(save, 'quiet-closing'),
-	'chair-keeper': (save) => save.flags.includes('keptTheChair') && save.records.endings.length > 0
+	'chair-keeper': (save) => save.records.chairEndings >= 1
 };
 
 /** Every badge whose condition currently holds, in definition order. */

@@ -182,6 +182,8 @@ export interface SaveState {
 		served: number;
 		namedSeen: string[];
 		endings: EndingRecord['id'][];
+		/** Endings reached while the chair was kept; career-level. */
+		chairEndings: number;
 	};
 	/** Keepsakes earned once; never revoked. */
 	badges: { id: string; day: number }[];

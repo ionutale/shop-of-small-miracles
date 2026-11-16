@@ -37,12 +37,16 @@ describe('badges', () => {
 	it('earns First Light on the first clean brew', () => {
 		expect(earned(saveFixture())).not.toContain('first-light');
 		expect(
-			earned(saveFixture({ records: { cleanBrews: 1, served: 0, namedSeen: [], endings: [] } }))
+			earned(
+				saveFixture({
+					records: { cleanBrews: 1, served: 0, namedSeen: [], endings: [], chairEndings: 0 }
+				})
+			)
 		).toContain('first-light');
 	});
 
 	it('earns Open for Business at fifty visitors served', () => {
-		const records = { cleanBrews: 0, served: 49, namedSeen: [], endings: [] };
+		const records = { cleanBrews: 0, served: 49, namedSeen: [], endings: [], chairEndings: 0 };
 
 		expect(earned(saveFixture({ records }))).not.toContain('open-for-business');
 		expect(earned(saveFixture({ records: { ...records, served: 50 } }))).toContain(
@@ -51,7 +55,7 @@ describe('badges', () => {
 	});
 
 	it('earns The Long Bench at ten clean brews', () => {
-		const records = { cleanBrews: 9, served: 0, namedSeen: [], endings: [] };
+		const records = { cleanBrews: 9, served: 0, namedSeen: [], endings: [], chairEndings: 0 };
 
 		expect(earned(saveFixture({ records }))).not.toContain('long-bench');
 		expect(earned(saveFixture({ records: { ...records, cleanBrews: 10 } }))).toContain(
@@ -64,7 +68,8 @@ describe('badges', () => {
 			cleanBrews: 0,
 			served: 0,
 			namedSeen: ALL_NAMED.slice(0, count),
-			endings: []
+			endings: [],
+			chairEndings: 0
 		});
 
 		expect(earned(saveFixture({ records: seen(4) }))).not.toContain('paper-trail');
@@ -98,7 +103,11 @@ describe('badges', () => {
 
 	it('earns an ending badge for each recorded ending', () => {
 		const withEndings = (endings: ('shop-endures' | 'last-miracle' | 'quiet-closing')[]) =>
-			earned(saveFixture({ records: { cleanBrews: 0, served: 0, namedSeen: [], endings } }));
+			earned(
+				saveFixture({
+					records: { cleanBrews: 0, served: 0, namedSeen: [], endings, chairEndings: 0 }
+				})
+			);
 
 		expect(withEndings([])).not.toContain('shop-endures');
 		expect(withEndings(['shop-endures'])).toContain('shop-endures');
@@ -106,24 +115,24 @@ describe('badges', () => {
 		expect(withEndings(['quiet-closing'])).toContain('quiet-closing');
 	});
 
-	it('earns Chair Keeper only for an ending reached with the chair kept', () => {
-		const records = {
+	it('earns Chair Keeper only from endings reached with the chair kept', () => {
+		const keptEnding = {
 			cleanBrews: 0,
 			served: 0,
 			namedSeen: [],
-			endings: ['shop-endures' as const]
+			endings: ['shop-endures' as const],
+			chairEndings: 1
 		};
+		const noChairEnding = { ...keptEnding, chairEndings: 0 };
 
-		expect(earned(saveFixture({ flags: ['keptTheChair'], records }))).toContain('chair-keeper');
-		expect(
-			earned(
-				saveFixture({
-					flags: ['keptTheChair'],
-					records: { ...records, endings: [] }
-				})
-			)
-		).not.toContain('chair-keeper');
-		expect(earned(saveFixture({ flags: [], records }))).not.toContain('chair-keeper');
+		expect(earned(saveFixture({ records: noChairEnding }))).not.toContain('chair-keeper');
+		expect(earned(saveFixture({ flags: ['keptTheChair'], records: noChairEnding }))).not.toContain(
+			'chair-keeper'
+		);
+		expect(earned(saveFixture({ records: keptEnding }))).toContain('chair-keeper');
+		expect(earned(saveFixture({ flags: ['keptTheChair'], records: keptEnding }))).toContain(
+			'chair-keeper'
+		);
 	});
 
 	it('lists every earned badge in definition order', () => {
@@ -134,7 +143,8 @@ describe('badges', () => {
 				cleanBrews: 10,
 				served: 50,
 				namedSeen: ALL_NAMED,
-				endings: ['shop-endures', 'last-miracle', 'quiet-closing']
+				endings: ['shop-endures', 'last-miracle', 'quiet-closing'],
+				chairEndings: 1
 			}
 		});
 
@@ -144,7 +154,7 @@ describe('badges', () => {
 	it('syncBadges appends the new badges with the current day', () => {
 		const save = saveFixture({
 			day: 12,
-			records: { cleanBrews: 1, served: 0, namedSeen: [], endings: [] }
+			records: { cleanBrews: 1, served: 0, namedSeen: [], endings: [], chairEndings: 0 }
 		});
 		const synced = syncBadges(save);
 
@@ -155,7 +165,7 @@ describe('badges', () => {
 
 	it('syncBadges is idempotent and returns the same object when nothing is new', () => {
 		const save = saveFixture({
-			records: { cleanBrews: 1, served: 0, namedSeen: [], endings: [] }
+			records: { cleanBrews: 1, served: 0, namedSeen: [], endings: [], chairEndings: 0 }
 		});
 		const once = syncBadges(save);
 		const twice = syncBadges(once);
@@ -178,7 +188,7 @@ describe('badges', () => {
 	it('syncBadges keeps earlier badges ahead of later ones', () => {
 		const save = saveFixture({
 			badges: [{ id: 'first-light', day: 2 }],
-			records: { cleanBrews: 10, served: 0, namedSeen: [], endings: [] }
+			records: { cleanBrews: 10, served: 0, namedSeen: [], endings: [], chairEndings: 0 }
 		});
 
 		expect(syncBadges(save).badges).toEqual([
