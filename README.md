@@ -63,6 +63,20 @@ A new shop shows a persistent goal bar (day, next rent, visitors served) and a o
 
 Progress lives in `localStorage` under `small-miracles:save:v1`. Every customer, brew, purchase, and phase change autosaves. A save that cannot be parsed (wrong version, impossible day, malformed fields) falls back to a fresh day-one shop with a dismissible recovery notice. Reset progress is two-step and keeps the sound and reduced-motion settings.
 
+## Badges
+
+The shop keeps a small career ledger in the save:
+
+- **Clean brews** — potions brewed with no extra essences.
+- **Visitors served** — every brew and every decline, across runs.
+- **Named potions seen** — the recipe book's known tag pairs.
+- **Endings seen** — each of the three endings, recorded once.
+- **Chair endings** — endings reached with the chair by the stove kept.
+
+Thirteen keepsake badges read that ledger (plus the current run's relationships) and are awarded automatically: First Light, Open for Business, The Long Bench, Paper Trail, The Whole Book, The Widow's Friend, Salt and Company, The Apprentice's Trust, Three Chairs, The Shop Endures, The Last Miracle, A Quiet Closing, and Chair Keeper. They are honors only — no bonuses, currency, or balance changes — and an award is never revoked.
+
+The Journal's **Small honors** section lists every badge: earned ones show their flavor line and `earned day N`, and locked ones show a hint. Reset progress clears the run but keeps the career ledger and the badge collection. Saves from before badges existed start both empty, and no badge is backfilled for past play.
+
 ## PWA and offline
 
 The manifest and service worker are generated during `pnpm build`; the icon PNGs are generated once by `pnpm pwa:assets` and copied into the build. After one online load the shop opens offline and resumes the exact day. A new build shows a "A new page is ready" prompt instead of reloading mid-service. Install guidance lives in Settings, with an install button when the browser offers one. To regenerate icons after changing `static/favicon.svg`:
