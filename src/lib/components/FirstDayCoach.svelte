@@ -19,8 +19,17 @@
 	} = $props();
 
 	const names = $derived.by(() => {
-		const list = (suggested ?? []).map((id) => ELEMENT_BY_ID.get(id)?.name ?? id);
-		if (list.length <= 2) return list.join(' and ');
+		const counts: { id: string; count: number }[] = [];
+		for (const id of suggested ?? []) {
+			const found = counts.find((entry) => entry.id === id);
+			if (found) found.count += 1;
+			else counts.push({ id, count: 1 });
+		}
+		const list = counts.map(({ id, count }) => {
+			const name = ELEMENT_BY_ID.get(id)?.name ?? id;
+			return count > 1 ? `${name} × ${count}` : name;
+		});
+		if (list.length <= 1) return list[0] ?? '';
 		return `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`;
 	});
 	const step = $derived(result ? 3 : slots.length === 3 ? 2 : 1);
@@ -41,10 +50,15 @@
 				A <strong>muddy miracle</strong>: both essences matched, but an extra one changed the
 				result. It still pays, just less. Press Next visitor.
 			</p>
+		{:else if result.tags.length === 0}
+			<p>
+				A <strong>gentle no</strong>. <strong>Nothing was consumed.</strong> When you are ready, try
+				{#if names}{names}.{:else}three matching essences.{/if} Then press Next visitor.
+			</p>
 		{:else}
 			<p>
-				A <strong>gentle no</strong>. The ingredients were spent; nothing was lost beyond them.
-				{#if names}Try {names}.{/if}
+				A <strong>gentle no</strong>. The ingredients were spent; nothing else was lost. Press Next
+				visitor.
 			</p>
 		{/if}
 	{:else if slots.length === 3}
@@ -52,7 +66,7 @@
 	{:else}
 		<p>
 			{customerName} asks for <strong>{tags[0]} + {tags[1]}</strong>. Three ingredients brew a
-			potion from their main essences; one can be doubled.
+			potion from their main essences; one is doubled.
 		</p>
 		{#if names}
 			<p class="try">Try {names}.</p>

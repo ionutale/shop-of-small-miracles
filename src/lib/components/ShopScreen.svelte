@@ -62,7 +62,7 @@
 			Boolean(visit)
 	);
 	const suggested = $derived(
-		visit && !result && !$game.tutorialDone && $game.day === 1
+		visit && !$game.tutorialDone && $game.day === 1 && (!result || result.tags.length === 0)
 			? suggestBrew($game.stock, visit.tags, ELEMENTS)
 			: null
 	);

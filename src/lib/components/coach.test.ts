@@ -50,6 +50,52 @@ describe('first-day coach', () => {
 		expect(get(game).tutorialDone).toBe(true);
 	});
 
+	it('tells the truth when the player declines politely', async () => {
+		initGame(42, serviceSave({ tutorialDone: false }));
+		const user = userEvent.setup();
+
+		render(ShopScreen);
+		await user.click(screen.getByRole('button', { name: /politely decline/i }));
+
+		const coach = screen.getByTestId('first-day-coach');
+		expect(coach).toHaveTextContent(/nothing was consumed/i);
+		expect(coach).toHaveTextContent(/try hydrogen, sodium and copper/i);
+		expect(coach).toHaveTextContent(/press next visitor/i);
+
+		await user.click(screen.getByRole('button', { name: /next visitor/i }));
+		expect(get(game).tutorialDone).toBe(true);
+	});
+
+	it('does not suggest a retry after a mismatched brew', async () => {
+		initGame(42, serviceSave({ tutorialDone: false }));
+		const user = userEvent.setup();
+
+		render(ShopScreen);
+		await user.click(screen.getByRole('button', { name: /^h hydrogen/i }));
+		await user.click(screen.getByRole('button', { name: /^o oxygen/i }));
+		await user.click(screen.getByRole('button', { name: /^ag silver/i }));
+		await user.click(screen.getByRole('button', { name: /^brew$/i }));
+
+		const coach = screen.getByTestId('first-day-coach');
+		expect(coach).toHaveTextContent(/ingredients were spent/i);
+		expect(coach).toHaveTextContent(/press next visitor/i);
+		expect(screen.queryByText(/try hydrogen/i)).not.toBeInTheDocument();
+	});
+
+	it('stays dismissed after a reload', async () => {
+		initGame(42, serviceSave({ tutorialDone: false }));
+		const user = userEvent.setup();
+
+		render(ShopScreen);
+		await user.click(screen.getByRole('button', { name: /hide guide/i }));
+
+		initGame(42);
+
+		expect(get(game).tutorialDone).toBe(true);
+		render(ShopScreen);
+		expect(screen.queryByTestId('first-day-coach')).not.toBeInTheDocument();
+	});
+
 	it('does not show for a returning save', () => {
 		initGame(42, serviceSave({ tutorialDone: true }));
 

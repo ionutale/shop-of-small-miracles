@@ -33,6 +33,15 @@ describe('suggestBrew', () => {
 		expect(suggestBrew(stock, ['Warm', 'Light'], ELEMENTS)).toBeNull();
 	});
 
+	it('can reuse one element when its units allow it', () => {
+		const stock = [
+			{ elementId: 'H', units: 1 },
+			{ elementId: 'Na', units: 3 }
+		];
+
+		expect(suggestBrew(stock, ['Warm', 'Light'], ELEMENTS)).toEqual(['Na', 'Na', 'H']);
+	});
+
 	it('returns null when the shelf cannot cover the tags', () => {
 		expect(suggestBrew(saveFixture().stock, ['Grief', 'Hollow'], ELEMENTS)).toBeNull();
 	});

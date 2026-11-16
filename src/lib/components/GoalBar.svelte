@@ -29,6 +29,7 @@
 
 <div class="goal" data-testid="goal-bar" role="group" aria-label="Today’s goal">
 	<span>Day {$game.day} of {TOTAL_DAYS}</span>
+	<span>Chapter {$game.chapter}</span>
 	<span>{rentText}</span>
 	{#if !ended}
 		<span>Visitors {visitors} of {VISITS_PER_DAY}</span>

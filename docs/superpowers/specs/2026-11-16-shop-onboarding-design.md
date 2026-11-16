@@ -5,7 +5,7 @@
 
 ## Intent
 
-New players understand the shop's mood but not its objective or first action. The game never states that the run lasts 21 days, that rent is due at chapter ends, or that three ingredients' **primary** essences must cover the customer's two tags with one doubled. This adds a calm, non-blocking layer that states the goal and walks the first customer, without turning the shop into a wizard.
+New players understand the shop's mood but not its objective or first action. The game never states that the run lasts 21 days, that rent is due at chapter ends, or that three ingredients' **primary** essences must cover the customer's two tags with one doubled (required). This adds a calm, non-blocking layer that states the goal and walks the first customer, without turning the shop into a wizard.
 
 ## Goals
 
@@ -50,7 +50,7 @@ The card has a quiet **Hide guide** action that sets `tutorialDone`. Choosing Ne
 
 ### Hint helper
 
-`suggestBrew(stock, visitTags, elements)` returns three element ids whose primaries cover both tags with one doubled, preferring distinct elements and in-stock units; `null` when impossible. Pure, tested, reusable.
+`suggestBrew(stock, visitTags, elements)` returns three element ids whose primaries cover both tags with one doubled (required), preferring distinct elements and in-stock units; `null` when impossible. Pure, tested, reusable.
 
 ### Save
 

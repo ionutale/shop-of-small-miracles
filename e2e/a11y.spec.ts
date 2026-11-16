@@ -57,6 +57,7 @@ async function smallTargets(page: Page): Promise<string[]> {
 
 const screens: { name: string; overrides: Record<string, unknown>; tab?: RegExp }[] = [
 	{ name: 'Shop', overrides: {} },
+	{ name: 'Shop with the first-day coach', overrides: { tutorialDone: false } },
 	{
 		name: 'Market',
 		overrides: {
@@ -198,7 +199,7 @@ test('continuing the final rent lands focus on the ending', async ({ page }) => 
 });
 
 test('every visible target is at least 44px on the browsing screens', async ({ page }) => {
-	await open(page);
+	await open(page, { tutorialDone: false });
 	expect(await smallTargets(page)).toEqual([]);
 
 	for (const tab of [/^book$/i, /^journal$/i, /^settings$/i]) {

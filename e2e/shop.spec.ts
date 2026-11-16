@@ -98,7 +98,7 @@ test('politely declining costs nothing', async ({ page }) => {
 	await page.getByRole('button', { name: /politely decline/i }).click();
 
 	await expect(page.getByRole('status')).toContainText(/thank you for trying/i);
-	await expect(page.getByText(/nothing was consumed/i)).toBeVisible();
+	await expect(page.getByTestId('result').getByText(/nothing was consumed/i)).toBeVisible();
 
 	await page.getByRole('button', { name: /next visitor/i }).click();
 	await expect(page.getByTestId('visitor-count')).toContainText('2 of 3');

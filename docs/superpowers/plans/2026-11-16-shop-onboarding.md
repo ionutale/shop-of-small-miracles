@@ -1,6 +1,6 @@
 # Shop Onboarding Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a persistent goal bar, a one-time first-day coach, and a pure brew-suggestion helper so new players know the 21-day/rent goal and the first three taps.
 
@@ -37,7 +37,7 @@
 **Interfaces:**
 - Produces: `suggestBrew(stock: readonly StockEntry[], tags: readonly [Tag, Tag], elements: readonly ElementRecord[]): string[] | null` — three element ids whose primaries cover both tags with one doubled; `null` when impossible.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 const ids = suggestBrew(saveFixture().stock, ['Warm', 'Light'], ELEMENTS)!;
@@ -47,16 +47,16 @@ expect(new Set(primaries)).toEqual(new Set(['Warm', 'Light']));
 expect(suggestBrew(saveFixture().stock, ['Grief', 'Hollow'], ELEMENTS)).toBeNull();
 ```
 
-- [ ] **Step 2: Run and confirm failure**
+- [x] **Step 2: Run and confirm failure**
 
 Run: `pnpm vitest run src/lib/game/hint.test.ts`
 Expected: FAIL (module not found).
 
-- [ ] **Step 3: Implement** — iterate in-stock ids in data order, try each ordered triple respecting units, return the first whose primary set equals the two tags with exactly one repeat; prefer three distinct ids when available.
+- [x] **Step 3: Implement** — iterate in-stock ids in data order, try each ordered triple respecting units, return the first whose primary set equals the two tags with exactly one repeat; prefer three distinct ids when available.
 
-- [ ] **Step 4: Verify** — `pnpm vitest run src/lib/game/hint.test.ts` → PASS.
+- [x] **Step 4: Verify** — `pnpm vitest run src/lib/game/hint.test.ts` → PASS.
 
-- [ ] **Step 5: Commit** — `feat: add a pure brew suggestion helper`.
+- [x] **Step 5: Commit** — `feat: add a pure brew suggestion helper`.
 
 ---
 
@@ -69,11 +69,11 @@ Expected: FAIL (module not found).
 **Interfaces:**
 - Produces: `SaveState.tutorialDone: boolean`; `dismissTutorial(): void`; new saves `false`, parsed legacy saves `true`, test fixture default `true`.
 
-- [ ] **Step 1: Failing test** — delete `tutorialDone` from a serialized initial save, parse it, expect `true`; `createInitialSave(42).tutorialDone` is `false`.
-- [ ] **Step 2: Run and confirm failure** — `pnpm vitest run src/lib/game/storage.test.ts`.
-- [ ] **Step 3: Implement** — add the field, backfill in `parseSave`, add store action that sets it and autosaves.
-- [ ] **Step 4: Verify** — storage + store tests pass.
-- [ ] **Step 5: Commit** — `feat: track one-time tutorial completion in the save`.
+- [x] **Step 1: Failing test** — delete `tutorialDone` from a serialized initial save, parse it, expect `true`; `createInitialSave(42).tutorialDone` is `false`.
+- [x] **Step 2: Run and confirm failure** — `pnpm vitest run src/lib/game/storage.test.ts`.
+- [x] **Step 3: Implement** — add the field, backfill in `parseSave`, add store action that sets it and autosaves.
+- [x] **Step 4: Verify** — storage + store tests pass.
+- [x] **Step 5: Commit** — `feat: track one-time tutorial completion in the save`.
 
 ---
 
@@ -87,11 +87,11 @@ Expected: FAIL (module not found).
 - Consumes: `game` store, `chapterForDay`, `rentDueOn`, `TOTAL_DAYS`, `VISITS_PER_DAY`.
 - Produces: `data-testid="goal-bar"` with text `Day N of 21`, a rent countdown (`Rent in N days` / `Rent due today` / `The last ledger is closed`), and `Visitors N of 3` (hidden when `phase === 'ending'`).
 
-- [ ] **Step 1: Failing test** — render `GoalBar` with fixtures for day 1 (`Rent in 6 days`), day 7 (`Rent due today`), and ending (no Visitors).
-- [ ] **Step 2: Run and confirm failure**.
-- [ ] **Step 3: Implement** the component and mount it under the shop status block, above the morning card.
-- [ ] **Step 4: Verify** goal tests + `pnpm check`.
-- [ ] **Step 5: Commit** — `feat: show the day, rent, and visitor goal bar`.
+- [x] **Step 1: Failing test** — render `GoalBar` with fixtures for day 1 (`Rent in 6 days`), day 7 (`Rent due today`), and ending (no Visitors).
+- [x] **Step 2: Run and confirm failure**.
+- [x] **Step 3: Implement** the component and mount it under the shop status block, above the morning card.
+- [x] **Step 4: Verify** goal tests + `pnpm check`.
+- [x] **Step 5: Commit** — `feat: show the day, rent, and visitor goal bar`.
 
 ---
 
@@ -106,11 +106,11 @@ Expected: FAIL (module not found).
 - `IngredientShelf` gains `suggestedIds?: readonly string[]`; matching cards get a soft `suggested` ring, no behavior change.
 - `ShopScreen` shows the coach only when `!$game.tutorialDone && $game.day === 1 && $game.phase === 'service'`; it passes `suggestedBrew` only while no result.
 
-- [ ] **Step 1: Failing test** — render `ShopScreen` with `serviceSave({ tutorialDone: false })`: coach shows the Widow + `Warm + Light` and names Hydrogen/Sodium/Copper; click those three, coach says press Brew; brew, coach shows the clean result; click Next visitor, coach disappears and `tutorialDone` is true. Add a dismiss-button test.
-- [ ] **Step 2: Run and confirm failure**.
-- [ ] **Step 3: Implement** the three steps from store props; mark `tutorialDone` on dismiss and when `nextCustomer`/`finishService` runs on day 1 after a result.
-- [ ] **Step 4: Verify** coach + shop tests, `pnpm check`.
-- [ ] **Step 5: Commit** — `feat: guide the first customer with a one-time coach`.
+- [x] **Step 1: Failing test** — render `ShopScreen` with `serviceSave({ tutorialDone: false })`: coach shows the Widow + `Warm + Light` and names Hydrogen/Sodium/Copper; click those three, coach says press Brew; brew, coach shows the clean result; click Next visitor, coach disappears and `tutorialDone` is true. Add a dismiss-button test.
+- [x] **Step 2: Run and confirm failure**.
+- [x] **Step 3: Implement** the three steps from store props; mark `tutorialDone` on dismiss and when `nextCustomer`/`finishService` runs on day 1 after a result.
+- [x] **Step 4: Verify** coach + shop tests, `pnpm check`.
+- [x] **Step 5: Commit** — `feat: guide the first customer with a one-time coach`.
 
 ---
 
@@ -121,18 +121,18 @@ Expected: FAIL (module not found).
 
 **Interfaces:** none.
 
-- [ ] **Step 1: Update the title lede** to the 21-day/rent goal and add the rule line: “A potion is three ingredients; their main essences must cover the customer’s two tags.”
-- [ ] **Step 2: README** — note the goal bar, first-day coach, and that returning saves skip it.
-- [ ] **Step 3: Verify** — page test still finds the shop heading; `pnpm lint`.
-- [ ] **Step 4: Commit** — `docs: explain the shop goal on the title and in the README`.
+- [x] **Step 1: Update the title lede** to the 21-day/rent goal and add the rule line: “A potion is three ingredients; their main essences must cover the customer’s two tags.”
+- [x] **Step 2: README** — note the goal bar, first-day coach, and that returning saves skip it.
+- [x] **Step 3: Verify** — page test still finds the shop heading; `pnpm lint`.
+- [x] **Step 4: Commit** — `docs: explain the shop goal on the title and in the README`.
 
 ---
 
 ### Task 6: Full regression
 
-- [ ] **Step 1** — `pnpm validate && pnpm check && pnpm lint && pnpm test && pnpm build && pnpm check:bundle && pnpm e2e`
-- [ ] **Step 2** — Browser check at 390×844: new game shows the goal bar and coach; existing seeded save shows the goal bar but no coach; coach does not cover Brew or Next.
-- [ ] **Step 3** — Commit any fixes, then deploy with `pnpm deploy` and push.
+- [x] **Step 1** — `pnpm validate && pnpm check && pnpm lint && pnpm test && pnpm build && pnpm check:bundle && pnpm e2e`
+- [x] **Step 2** — Browser check at 390×844: new game shows the goal bar and coach; existing seeded save shows the goal bar but no coach; coach does not cover Brew or Next.
+- [x] **Step 3** — Commit any fixes, then deploy with `pnpm deploy` and push.
 
 ## Self-Review
 
