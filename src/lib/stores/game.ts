@@ -142,13 +142,24 @@ export function decline(): void {
 	});
 }
 
+function completedTutorial(state: SaveState): SaveState {
+	return state.day === 1 && !state.tutorialDone ? { ...state, tutorialDone: true } : state;
+}
+
+/** Hide the one-time first-day coach. */
+export function dismissTutorial(): void {
+	const current = get(game);
+	if (current.tutorialDone) return;
+	game.set({ ...current, tutorialDone: true });
+}
+
 /** Clears the result and presents the next solvable visitor, or the evening. */
 export function nextCustomer(): void {
 	const current = get(game);
 	if (!current.lastResult) return;
 
 	if (current.servedToday >= VISITS_PER_DAY) {
-		game.set(endServiceState(current));
+		game.set(completedTutorial(endServiceState(current)));
 		return;
 	}
 
@@ -161,32 +172,36 @@ export function nextCustomer(): void {
 	});
 
 	if (!picked.visit) {
-		game.set({
-			...current,
-			activeVisitId: null,
-			quietDay: true,
-			lastResult: null,
-			rngState: picked.rngState,
-			phase: 'service'
-		});
+		game.set(
+			completedTutorial({
+				...current,
+				activeVisitId: null,
+				quietDay: true,
+				lastResult: null,
+				rngState: picked.rngState,
+				phase: 'service'
+			})
+		);
 		return;
 	}
 
-	game.set({
-		...current,
-		activeVisitId: picked.visit.id,
-		quietDay: false,
-		lastResult: null,
-		rngState: picked.rngState,
-		phase: 'service'
-	});
+	game.set(
+		completedTutorial({
+			...current,
+			activeVisitId: picked.visit.id,
+			quietDay: false,
+			lastResult: null,
+			rngState: picked.rngState,
+			phase: 'service'
+		})
+	);
 }
 
 /** Closes service early: a quiet day still goes on to the evening. */
 export function finishService(): void {
 	const current = get(game);
 	if (current.phase !== 'service') return;
-	game.set(endServiceState(current));
+	game.set(completedTutorial(endServiceState(current)));
 }
 
 /** Closes the shop and opens the next service day. */

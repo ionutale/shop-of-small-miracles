@@ -174,6 +174,8 @@ export interface SaveState {
 	morningSeenDay: number;
 	/** Authored story options already taken, in order. */
 	choices: string[];
+	/** Whether the one-time first-day coach has been finished or dismissed. */
+	tutorialDone: boolean;
 }
 
 export interface ContentBundle {

@@ -58,7 +58,8 @@ export function createInitialSave(seed = 42): SaveState {
 		introSeen: true,
 		lastResult: null,
 		morningSeenDay: 0,
-		choices: []
+		choices: [],
+		tutorialDone: false
 	};
 
 	return beginServiceDay(base, 1);
@@ -158,7 +159,8 @@ export function parseSave(raw: string | null): SaveState | null {
 			? (value.choices as unknown[]).filter(
 					(choice): choice is string => typeof choice === 'string'
 				)
-			: []
+			: [],
+		tutorialDone: typeof value.tutorialDone === 'boolean' ? value.tutorialDone : true
 	};
 }
 

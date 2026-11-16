@@ -69,6 +69,17 @@ describe('storage', () => {
 		expect(parsed?.upgradeBoughtToday).toBe(false);
 	});
 
+	it('starts a new save with the first-day coach available', () => {
+		expect(createInitialSave(42).tutorialDone).toBe(false);
+	});
+
+	it('backfills tutorial completion for an older save', () => {
+		const legacy = { ...createInitialSave(42) } as Record<string, unknown>;
+		delete legacy.tutorialDone;
+
+		expect(parseSave(JSON.stringify(legacy))?.tutorialDone).toBe(true);
+	});
+
 	it('backfills the morning and story fields for an older save', () => {
 		const legacy = { ...createInitialSave(42) } as Record<string, unknown>;
 		delete legacy.morningSeenDay;

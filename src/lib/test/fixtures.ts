@@ -52,6 +52,7 @@ export function saveFixture(overrides: Partial<SaveState> = {}): SaveState {
 		lastResult: null,
 		morningSeenDay: 0,
 		choices: [],
+		tutorialDone: true,
 		...overrides
 	};
 }
