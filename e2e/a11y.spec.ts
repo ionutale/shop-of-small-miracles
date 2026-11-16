@@ -122,7 +122,7 @@ test('the element detail dialog has no axe violations', async ({ page }) => {
 test('the reset dialog has no axe violations', async ({ page }) => {
 	await open(page, {}, /^settings$/i);
 
-	await page.getByRole('button', { name: /reset all progress/i }).click();
+	await page.getByRole('button', { name: /reset this run/i }).click();
 	await expect(page.getByRole('dialog')).toBeVisible();
 
 	const results = await new AxeBuilder({ page }).analyze();
@@ -207,7 +207,7 @@ test('every visible target is at least 44px on the browsing screens', async ({ p
 		expect(await smallTargets(page)).toEqual([]);
 	}
 
-	await page.getByRole('button', { name: /reset all progress/i }).click();
+	await page.getByRole('button', { name: /reset this run/i }).click();
 	expect(await smallTargets(page)).toEqual([]);
 	await page.keyboard.press('Escape');
 });

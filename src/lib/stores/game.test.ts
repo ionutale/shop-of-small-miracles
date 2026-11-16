@@ -177,6 +177,61 @@ describe('game store', () => {
 		expect(get(game).records.chairEndings).toBe(1);
 	});
 
+	it('counts a chair ending even when an earlier run already recorded the ending', () => {
+		initGame(
+			42,
+			serviceSave({
+				day: 21,
+				chapter: 3,
+				phase: 'chapterEnd',
+				coins: 200,
+				reputation: 5,
+				flags: ['keptTheChair'],
+				records: {
+					cleanBrews: 0,
+					served: 0,
+					namedSeen: [],
+					endings: ['shop-endures'],
+					chairEndings: 0
+				}
+			})
+		);
+
+		settleRent();
+		leaveRentScene();
+
+		const closed = get(game);
+		expect(closed.phase).toBe('ending');
+		expect(closed.records.endings).toEqual(['shop-endures']);
+		expect(closed.records.chairEndings).toBe(1);
+		expect(closed.badges.map((badge) => badge.id)).toContain('chair-keeper');
+
+		leaveRentScene();
+		expect(get(game).records.chairEndings).toBe(1);
+	});
+
+	it('counts one chair ending per transition, never twice', () => {
+		initGame(
+			42,
+			serviceSave({
+				day: 21,
+				chapter: 3,
+				phase: 'chapterEnd',
+				coins: 200,
+				reputation: 5,
+				flags: ['keptTheChair']
+			})
+		);
+
+		settleRent();
+		leaveRentScene();
+		leaveRentScene();
+
+		const closed = get(game);
+		expect(closed.records.endings).toEqual(['shop-endures']);
+		expect(closed.records.chairEndings).toBe(1);
+	});
+
 	it('does not count a chair ending when the chair was given up', () => {
 		initGame(
 			42,

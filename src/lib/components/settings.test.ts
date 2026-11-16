@@ -56,7 +56,7 @@ describe('settings', () => {
 
 		render(SettingsScreen);
 
-		await user.click(screen.getByRole('button', { name: /reset all progress/i }));
+		await user.click(screen.getByRole('button', { name: /reset this run/i }));
 
 		expect(screen.getByRole('button', { name: /yes, clear the shop/i })).toBeInTheDocument();
 		expect(get(game).day).toBe(9);
@@ -78,7 +78,7 @@ describe('settings', () => {
 
 		await user.click(screen.getByRole('checkbox', { name: /sound/i }));
 		await user.click(screen.getByRole('checkbox', { name: /reduce motion/i }));
-		await user.click(screen.getByRole('button', { name: /reset all progress/i }));
+		await user.click(screen.getByRole('button', { name: /reset this run/i }));
 		await user.click(screen.getByRole('button', { name: /yes, clear the shop/i }));
 
 		expect(get(game).day).toBe(1);
@@ -91,7 +91,7 @@ describe('settings', () => {
 
 		render(SettingsScreen);
 
-		const trigger = screen.getByRole('button', { name: /reset all progress/i });
+		const trigger = screen.getByRole('button', { name: /reset this run/i });
 		trigger.focus();
 		await user.click(trigger);
 
@@ -111,13 +111,13 @@ describe('settings', () => {
 		await tick();
 
 		expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-		expect(screen.getByRole('button', { name: /reset all progress/i })).toHaveFocus();
+		expect(screen.getByRole('button', { name: /reset this run/i })).toHaveFocus();
 
-		await user.click(screen.getByRole('button', { name: /reset all progress/i }));
+		await user.click(screen.getByRole('button', { name: /reset this run/i }));
 		await user.click(screen.getByRole('button', { name: /keep my shop/i }));
 		await tick();
 
-		expect(screen.getByRole('button', { name: /reset all progress/i })).toHaveFocus();
+		expect(screen.getByRole('button', { name: /reset this run/i })).toHaveFocus();
 	});
 
 	it('can keep the shop after arming the reset', async () => {
@@ -126,11 +126,11 @@ describe('settings', () => {
 
 		render(SettingsScreen);
 
-		await user.click(screen.getByRole('button', { name: /reset all progress/i }));
+		await user.click(screen.getByRole('button', { name: /reset this run/i }));
 		await user.click(screen.getByRole('button', { name: /keep my shop/i }));
 
 		expect(get(game).day).toBe(9);
-		expect(screen.getByRole('button', { name: /reset all progress/i })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /reset this run/i })).toBeInTheDocument();
 	});
 
 	it('offers the captured install prompt when the browser provides one', () => {

@@ -72,7 +72,7 @@
 	<section class="honors" aria-labelledby="honors-title">
 		<h2 id="honors-title">Small honors</h2>
 		<p class="note">{earnedHonors.length} / {BADGES.length} earned.</p>
-		<ul class="honor-list" aria-labelledby="honors-title">
+		<ul class="honor-list" role="list" aria-labelledby="honors-title">
 			{#each honors as honor (honor.id)}
 				<li class="honor paper" class:earned={honor.earnedDay !== null}>
 					<p class="name hand">{honor.title}</p>
@@ -80,6 +80,7 @@
 						<p class="flavor">{honor.flavor}</p>
 						<p class="honor-day">earned day {honor.earnedDay}</p>
 					{:else}
+						<span class="visually-hidden">Not yet earned.</span>
 						<p class="hint">{honor.hint}</p>
 					{/if}
 				</li>

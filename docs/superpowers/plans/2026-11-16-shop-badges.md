@@ -36,7 +36,7 @@
 - Test: `src/lib/game/storage.test.ts`
 
 **Interfaces:**
-- Produces: `SaveState.records: { cleanBrews: number; served: number; namedSeen: string[]; endings: SaveState['records']['endings']; chairEndings: number }` and `SaveState.badges: { id: string; day: number }[]`; new saves zeroed; legacy saves backfilled zero/empty; `resetGame` preserves both.
+- Produces: `SaveState.records: { cleanBrews: number; served: number; namedSeen: string[]; endings: EndingRecord['id'][]; chairEndings: number }` and `SaveState.badges: { id: string; day: number }[]`; new saves zeroed; legacy saves backfilled zero/empty; `resetGame` preserves both.
 
 - [x] **Step 1: Failing test** — parse a save without `records`/`badges` and expect `{ cleanBrews: 0, served: 0, namedSeen: [], endings: [] }` and `[]`; assert a fresh initial save has the same, and `resetGame` keeps seeded values.
 - [x] **Step 2: Run and confirm failure** — `pnpm vitest run src/lib/game/storage.test.ts`.
@@ -54,9 +54,9 @@
 **Interfaces:**
 - Produces: `BadgeId` union, `BadgeRecord { id; title; flavor; hint }`, `BADGES`, `earnedBadgeIds(save): BadgeId[]`, `syncBadges(save): SaveState` (same object when nothing new).
 
-- [x] **Step 1: Failing test** — first clean brew earns `first-light`; 10 clean brews earns `long-bench`; all 24 named seen earns `whole-book`; each relationship ≥8 and all ≥6 earns their badges; `endings` containing an id earns the ending badge; `keptTheChair` + ending earns `chair-keeper`; sync called twice adds no duplicates.
+- [x] **Step 1: Failing test** — first clean brew earns `first-light`; 10 clean brews earns `long-bench`; all 24 named seen earns `whole-book`; each relationship ≥8 and all ≥6 earns their badges; `endings` containing an id earns the ending badge; a run that kept the chair increments `chairEndings` on the transition into an ending, earning `chair-keeper` even when the ending id was already recorded; sync called twice adds no duplicates.
 - [x] **Step 2: Run and confirm failure**.
-- [x] **Step 3: Implement** the 13 metadata records and pure predicates against `records`, current `relationships`, and `flags`.
+- [x] **Step 3: Implement** the 13 metadata records and pure predicates against `records` and `relationships`.
 - [x] **Step 4: Verify** — `pnpm vitest run src/lib/game/badges.test.ts`.
 - [x] **Step 5: Commit** — `feat: define the keepsake badges and evaluation`.
 

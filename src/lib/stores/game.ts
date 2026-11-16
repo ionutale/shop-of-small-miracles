@@ -55,7 +55,6 @@ export function initGame(seed = 42, overrides: Partial<SaveState> = {}): void {
 	ready = true;
 	game.set(state);
 	recovered.set(loaded.recovered);
-	saveGame(state);
 }
 
 function potionKey(tags: readonly string[]): string {
@@ -296,26 +295,30 @@ export function settleRent(): void {
 
 /** Dismisses the paid-or-setback page and shows the next morning or ending. */
 export function leaveRentScene(): void {
-	game.set(recordEnding(continueAfterRentState(get(game))));
+	const current = get(game);
+	game.set(recordEnding(current, continueAfterRentState(current)));
 }
 
 /**
  * The final ledger opens the ending; the career ledger remembers it once.
- * A chair ending counts only when this save kept the chair and the ending
- * itself is newly recorded, so replaying the scene cannot tally twice.
+ * A chair ending counts on the transition into the ending when this run kept
+ * the chair, even if an earlier run already recorded the same ending id, so a
+ * repeat entry or a reload on the ending cannot tally twice.
  */
-function recordEnding(state: SaveState): SaveState {
-	if (state.phase !== 'ending') return state;
+function recordEnding(current: SaveState, state: SaveState): SaveState {
+	if (current.phase === 'ending' || state.phase !== 'ending') return state;
 
 	const id = selectEnding(state).id;
-	if (state.records.endings.includes(id)) return state;
+	const known = state.records.endings.includes(id);
+	const keepingChair = current.flags.includes('keptTheChair');
+	if (known && !keepingChair) return state;
 
 	return {
 		...state,
 		records: {
 			...state.records,
-			endings: [...state.records.endings, id],
-			chairEndings: state.records.chairEndings + (state.flags.includes('keptTheChair') ? 1 : 0)
+			endings: known ? state.records.endings : [...state.records.endings, id],
+			chairEndings: state.records.chairEndings + (keepingChair ? 1 : 0)
 		}
 	};
 }

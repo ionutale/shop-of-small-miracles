@@ -118,7 +118,7 @@
 					if (event.target === event.currentTarget) cancelReset();
 				}}
 			>
-				<h3 id="reset-title">Reset all progress?</h3>
+				<h3 id="reset-title">Reset this run?</h3>
 				<p id="reset-note">
 					This clears the current run: the save, the recipe book, and every choice. Your career
 					ledger, badges, and settings are kept.
@@ -129,14 +129,14 @@
 				</div>
 			</dialog>
 		{:else}
-			<p>Start again from a single hydrogen atom and an empty ledger.</p>
+			<p>Start again from a single hydrogen atom and an empty shelf.</p>
 			<button
 				class="danger"
 				type="button"
 				bind:this={resetTrigger}
 				onclick={() => (confirming = true)}
 			>
-				Reset all progress
+				Reset this run
 			</button>
 		{/if}
 	</section>

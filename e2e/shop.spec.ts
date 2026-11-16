@@ -295,7 +295,7 @@ test('a double-click on reset does not clear the shop', async ({ page }) => {
 	await enterShop(page);
 
 	await page.getByRole('button', { name: /^settings$/i }).click();
-	await page.getByRole('button', { name: /reset all progress/i }).dblclick();
+	await page.getByRole('button', { name: /reset this run/i }).dblclick();
 
 	const day = await page.evaluate(
 		(key) => JSON.parse(localStorage.getItem(key) ?? '{}').day,

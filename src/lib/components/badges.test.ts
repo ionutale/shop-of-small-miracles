@@ -23,6 +23,7 @@ describe('journal honors', () => {
 		expect(earned).not.toBeNull();
 		expect(within(earned!).getByText(FIRST_LIGHT.flavor)).toBeInTheDocument();
 		expect(within(earned!).getByText(/earned day 2/i)).toBeInTheDocument();
+		expect(within(earned!).queryByText(/not yet earned/i)).not.toBeInTheDocument();
 	});
 
 	it('lists a locked badge with its hint and no earned marker', () => {
@@ -34,6 +35,7 @@ describe('journal honors', () => {
 		expect(screen.getByText(OPEN_FOR_BUSINESS.hint)).toBeInTheDocument();
 
 		const locked = screen.getByText(OPEN_FOR_BUSINESS.title).closest('li');
+		expect(within(locked!).getByText('Not yet earned.')).toBeInTheDocument();
 		expect(within(locked!).queryByText(/earned day/i)).not.toBeInTheDocument();
 		expect(within(locked!).queryByText(OPEN_FOR_BUSINESS.flavor)).not.toBeInTheDocument();
 	});

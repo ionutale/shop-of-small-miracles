@@ -69,7 +69,7 @@ The shop keeps a small career ledger in the save:
 
 - **Clean brews** — potions brewed with no extra essences.
 - **Visitors served** — every brew and every decline, across runs.
-- **Named potions seen** — the recipe book's known tag pairs.
+- **Named potions brewed at least once**.
 - **Endings seen** — each of the three endings, recorded once.
 - **Chair endings** — endings reached with the chair by the stove kept.
 
