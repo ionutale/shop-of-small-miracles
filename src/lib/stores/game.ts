@@ -295,11 +295,16 @@ export function dismissMorning(): void {
 	game.set(withSetbackStory({ ...current, morningSeenDay: current.day }));
 }
 
-/** Start over from day one but keep the player's comfort settings. */
+/** Start over from day one but keep the player's comfort settings and career ledger. */
 export function resetGame(seed = 42): void {
 	const current = get(game);
 	const fresh = createInitialSave(seed);
-	initGame(seed, { ...fresh, settings: { ...current.settings } });
+	initGame(seed, {
+		...fresh,
+		settings: { ...current.settings },
+		records: current.records,
+		badges: current.badges
+	});
 }
 
 /** The two comfort settings; both autosave through the store subscription. */

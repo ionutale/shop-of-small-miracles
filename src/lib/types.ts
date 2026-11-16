@@ -176,6 +176,15 @@ export interface SaveState {
 	choices: string[];
 	/** Whether the one-time first-day coach has been finished or dismissed. */
 	tutorialDone: boolean;
+	/** Career totals that survive a reset. */
+	records: {
+		cleanBrews: number;
+		served: number;
+		namedSeen: string[];
+		endings: EndingRecord['id'][];
+	};
+	/** Keepsakes earned once; never revoked. */
+	badges: { id: string; day: number }[];
 }
 
 export interface ContentBundle {

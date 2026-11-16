@@ -1,7 +1,23 @@
+import { get } from 'svelte/store';
 import { describe, expect, it } from 'vitest';
-import { memoryStorage } from '../test/fixtures';
+import type { SaveState } from '../types';
+import { memoryStorage, serviceSave } from '../test/fixtures';
+import { game, initGame, resetGame } from '../stores/game';
 import { dayRngState } from './rng';
 import { createInitialSave, loadSave, parseSave, saveGame, SAVE_KEY } from './storage';
+
+const EMPTY_RECORDS: SaveState['records'] = {
+	cleanBrews: 0,
+	served: 0,
+	namedSeen: [],
+	endings: []
+};
+const SEEDED_RECORDS: SaveState['records'] = {
+	cleanBrews: 3,
+	served: 12,
+	namedSeen: ["Widow's Lamp"],
+	endings: ['quiet-closing']
+};
 
 describe('storage', () => {
 	it('creates a day-one shop with a stocked shelf and the fixed first visitor waiting', () => {
@@ -109,5 +125,60 @@ describe('storage', () => {
 
 		expect(loaded.market).toEqual(save.market);
 		expect(loaded.rentOutcome).toEqual(save.rentOutcome);
+	});
+
+	it('starts a new career ledger empty', () => {
+		const save = createInitialSave(42);
+
+		expect(save.records).toEqual(EMPTY_RECORDS);
+		expect(save.badges).toEqual([]);
+	});
+
+	it('backfills an empty career ledger for an older save', () => {
+		const legacy = { ...createInitialSave(42) } as Record<string, unknown>;
+		delete legacy.records;
+		delete legacy.badges;
+
+		const parsed = parseSave(JSON.stringify(legacy));
+
+		expect(parsed?.records).toEqual(EMPTY_RECORDS);
+		expect(parsed?.badges).toEqual([]);
+	});
+
+	it('drops unusable career entries instead of trusting them', () => {
+		const damaged = {
+			...createInitialSave(42),
+			records: {
+				cleanBrews: -2,
+				served: 'many',
+				namedSeen: ["Widow's Lamp", 7],
+				endings: ['quiet-closing', 3]
+			},
+			badges: [{ id: 'first-light', day: 2 }, { id: 5, day: 1 }, 'nope']
+		};
+
+		const parsed = parseSave(JSON.stringify(damaged));
+
+		expect(parsed?.records).toEqual({
+			cleanBrews: 0,
+			served: 0,
+			namedSeen: ["Widow's Lamp"],
+			endings: ['quiet-closing']
+		});
+		expect(parsed?.badges).toEqual([{ id: 'first-light', day: 2 }]);
+	});
+
+	it('keeps the career ledger and badges across a reset', () => {
+		localStorage.clear();
+		initGame(42, serviceSave({ records: SEEDED_RECORDS, badges: [{ id: 'first-light', day: 2 }] }));
+		// The stored save may predate the ledger; the live career is what reset keeps.
+		saveGame(createInitialSave(42), localStorage);
+
+		resetGame();
+
+		expect(get(game).records).toEqual(SEEDED_RECORDS);
+		expect(get(game).badges).toEqual([{ id: 'first-light', day: 2 }]);
+		expect(get(game).day).toBe(1);
+		expect(get(game).flags).toEqual([]);
 	});
 });

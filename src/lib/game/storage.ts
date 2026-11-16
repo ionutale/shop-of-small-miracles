@@ -59,7 +59,9 @@ export function createInitialSave(seed = 42): SaveState {
 		lastResult: null,
 		morningSeenDay: 0,
 		choices: [],
-		tutorialDone: false
+		tutorialDone: false,
+		records: { cleanBrews: 0, served: 0, namedSeen: [], endings: [] },
+		badges: []
 	};
 
 	return beginServiceDay(base, 1);
@@ -79,6 +81,29 @@ function isRentOutcome(value: unknown): value is RentOutcome {
 		(value.kind === 'paid' || value.kind === 'shortfall') &&
 		typeof value.message === 'string'
 	);
+}
+
+function nonNegativeCount(value: unknown): number {
+	return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : 0;
+}
+
+function stringList(value: unknown): string[] {
+	return Array.isArray(value)
+		? value.filter((entry): entry is string => typeof entry === 'string')
+		: [];
+}
+
+function badgeList(value: unknown): SaveState['badges'] {
+	if (!Array.isArray(value)) return [];
+	return value
+		.filter(
+			(badge): badge is SaveState['badges'][number] =>
+				isRecord(badge) &&
+				typeof badge.id === 'string' &&
+				Number.isInteger(badge.day) &&
+				(badge.day as number) >= 1
+		)
+		.map((badge) => ({ id: badge.id, day: badge.day }));
 }
 
 /**
@@ -110,6 +135,7 @@ export function parseSave(raw: string | null): SaveState | null {
 	const base = createInitialSave(typeof value.seed === 'number' ? value.seed : 42);
 	const settings = isRecord(value.settings) ? value.settings : {};
 	const relationships = isRecord(value.relationships) ? value.relationships : {};
+	const records = isRecord(value.records) ? value.records : {};
 	const upgrades = Array.isArray(value.upgrades) ? (value.upgrades as string[]) : [];
 	const shelfCapacity =
 		Number.isInteger(value.shelfCapacity) && (value.shelfCapacity as number) > 0
@@ -160,7 +186,14 @@ export function parseSave(raw: string | null): SaveState | null {
 					(choice): choice is string => typeof choice === 'string'
 				)
 			: [],
-		tutorialDone: typeof value.tutorialDone === 'boolean' ? value.tutorialDone : true
+		tutorialDone: typeof value.tutorialDone === 'boolean' ? value.tutorialDone : true,
+		records: {
+			cleanBrews: nonNegativeCount(records.cleanBrews),
+			served: nonNegativeCount(records.served),
+			namedSeen: stringList(records.namedSeen),
+			endings: stringList(records.endings) as SaveState['records']['endings']
+		},
+		badges: badgeList(value.badges)
 	};
 }
 
