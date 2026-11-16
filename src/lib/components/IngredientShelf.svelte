@@ -9,10 +9,12 @@
 	let {
 		entries,
 		disabled = false,
+		suggestedIds = [],
 		onPick
 	}: {
 		entries: readonly { element: ElementRecord; units: number }[];
 		disabled?: boolean;
+		suggestedIds?: readonly string[];
 		onPick: (elementId: string) => void;
 	} = $props();
 
@@ -77,6 +79,7 @@
 					type="button"
 					class="element"
 					class:empty={units === 0}
+					class:suggested={suggestedIds.includes(element.id)}
 					disabled={disabled || units === 0}
 					onclick={() => onPick(element.id)}
 				>
@@ -267,6 +270,13 @@
 
 	.element {
 		padding-right: 2.1rem;
+	}
+
+	.element.suggested {
+		border-color: rgba(176, 138, 79, 0.8);
+		box-shadow:
+			inset 0 0 0 2px rgba(232, 184, 106, 0.45),
+			0 0 12px rgba(232, 184, 106, 0.25);
 	}
 
 	.notes {

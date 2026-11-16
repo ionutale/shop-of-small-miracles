@@ -5,9 +5,11 @@
 	import { namePotion } from '../data/potions';
 	import { ownedUpgrades } from '../data/upgrades';
 	import { brewTags, judgeBrew } from '../game/brew';
+	import { suggestBrew } from '../game/hint';
 	import { playSound } from '../game/sound';
 	import {
 		brew,
+		dismissTutorial,
 		decline,
 		finishService,
 		game,
@@ -19,6 +21,7 @@
 	import Cauldron from './Cauldron.svelte';
 	import CustomerCard from './CustomerCard.svelte';
 	import EndingPage from './EndingPage.svelte';
+	import FirstDayCoach from './FirstDayCoach.svelte';
 	import GoalBar from './GoalBar.svelte';
 	import IngredientShelf from './IngredientShelf.svelte';
 	import MarketScreen from './MarketScreen.svelte';
@@ -57,6 +60,11 @@
 			!$game.swappedToday &&
 			!result &&
 			Boolean(visit)
+	);
+	const suggested = $derived(
+		visit && !result && !$game.tutorialDone && $game.day === 1
+			? suggestBrew($game.stock, visit.tags, ELEMENTS)
+			: null
 	);
 	const announcement = $derived.by(() => {
 		if ($game.rentOutcome) return $game.rentOutcome.message;
@@ -157,6 +165,17 @@
 			<MorningScene />
 		{/if}
 
+		{#if visit && !$game.tutorialDone && $game.day === 1 && $game.phase === 'service'}
+			<FirstDayCoach
+				customerName={character?.name ?? 'The visitor'}
+				tags={visit.tags}
+				{slots}
+				{result}
+				{suggested}
+				onDismiss={dismissTutorial}
+			/>
+		{/if}
+
 		{#if $game.rentOutcome}
 			<RentScene />
 		{:else if showingEnding}
@@ -225,7 +244,12 @@
 							</section>
 						{:else}
 							<Cauldron {slots} onRemove={remove} />
-							<IngredientShelf entries={shelf} disabled={slots.length >= 3} onPick={pick} />
+							<IngredientShelf
+								entries={shelf}
+								disabled={slots.length >= 3}
+								suggestedIds={suggested ?? []}
+								onPick={pick}
+							/>
 							<BrewPreview
 								{preview}
 								potionName={namedPotion}
