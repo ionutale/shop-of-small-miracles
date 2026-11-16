@@ -13,7 +13,7 @@
 
 		<p class="rule">
 			A potion is three ingredients; their <strong>main essences</strong> must cover the customer’s two
-			tags. One can be doubled.
+			tags. One is doubled.
 		</p>
 
 		<div class="actions">
