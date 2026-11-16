@@ -66,7 +66,7 @@ badges: { id: string; day: number }[];
 - `brew()` increments `served`, increments `cleanBrews` on a clean outcome, and adds the named potion (if any) to `namedSeen`.
 - `decline()` increments `served`.
 - Reaching the ending records the selected ending id once.
-- `chairEndings` increments once, only when a newly recorded ending has `keptTheChair`; a repeated or fallback ending record does not increment it.
+- `chairEndings` increments once per transition into the ending when the run kept the chair, even if that ending id was already recorded; repeated calls or a reload on the ending do not increment it.
 - A pure `syncBadges(save)` adds every newly satisfied badge with the current day; it is idempotent and called from the store subscription before autosave.
 - Badge evaluation reads only the save; no timers, randomness, or network.
 

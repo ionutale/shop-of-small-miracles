@@ -63,7 +63,8 @@
 
 	{#if confirming}
 		<p class="confirm-note">
-			Start again from day one? The shop, the book, and the journal will be cleared.
+			Start again from day one? The shop and this run’s book will be cleared. Your career ledger and
+			badges are kept.
 		</p>
 		<div class="confirm-actions">
 			<button class="new-game quiet" type="button" onclick={() => (confirming = false)}>

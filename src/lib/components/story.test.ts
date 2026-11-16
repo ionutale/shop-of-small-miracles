@@ -184,6 +184,7 @@ describe('ending page', () => {
 
 		expect(get(game).day).toBe(21);
 		expect(screen.getByRole('button', { name: /yes, start over/i })).toBeInTheDocument();
+		expect(screen.getByText(/your career ledger and badges are kept/i)).toBeInTheDocument();
 
 		await user.click(screen.getByRole('button', { name: /yes, start over/i }));
 
