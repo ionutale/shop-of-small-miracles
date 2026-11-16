@@ -55,6 +55,10 @@ Customers are stock-aware. A visit is only offered when the current shelf can ac
 
 There is no game-over state. Missing rent is a setback: the landlord takes the most expensive upgrade or one unit of shelf capacity, reputation drops by 2, coins are set to 10, and the setback is recorded toward the ending. The shop always continues, and a quiet closing is still framed as a choice rather than a punishment. No ending is labelled "bad".
 
+## Onboarding
+
+A new shop shows a persistent goal bar (day, next rent, visitors served) and a one-time first-day coach that walks the first customer: pick three essences that cover both requested tags, press Brew, then read the result. The coach suggests the starting trio and highlights those shelf cards. Existing saves skip it; reset starts it again.
+
 ## Saving
 
 Progress lives in `localStorage` under `small-miracles:save:v1`. Every customer, brew, purchase, and phase change autosaves. A save that cannot be parsed (wrong version, impossible day, malformed fields) falls back to a fresh day-one shop with a dismissible recovery notice. Reset progress is two-step and keeps the sound and reduced-motion settings.

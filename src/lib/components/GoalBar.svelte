@@ -2,9 +2,15 @@
 	import { TOTAL_DAYS, VISITS_PER_DAY } from '../data/chapters';
 	import { game } from '../stores/game';
 
+	const ended = $derived(
+		$game.phase === 'ending' ||
+			($game.phase === 'chapterEnd' &&
+				$game.day >= TOTAL_DAYS &&
+				$game.flags.includes('ledgerClosed'))
+	);
 	const rentDay = $derived([7, 14, 21].find((day) => day >= $game.day) ?? null);
 	const rentText = $derived(
-		$game.phase === 'ending' || rentDay === null
+		ended || rentDay === null
 			? 'The last ledger is closed'
 			: rentDay === $game.day
 				? 'Rent due today'
@@ -24,7 +30,7 @@
 <div class="goal" data-testid="goal-bar" role="group" aria-label="Today’s goal">
 	<span>Day {$game.day} of {TOTAL_DAYS}</span>
 	<span>{rentText}</span>
-	{#if $game.phase !== 'ending'}
+	{#if !ended}
 		<span>Visitors {visitors} of {VISITS_PER_DAY}</span>
 	{/if}
 </div>

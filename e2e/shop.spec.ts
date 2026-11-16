@@ -82,7 +82,7 @@ test('a mismatched brew spends the ingredients and leaves reputation alone', asy
 	await page.getByRole('button', { name: /^brew$/i }).click();
 
 	await expect(page.getByRole('status')).toContainText(/that is not light/i);
-	await expect(page.getByText(/the ingredients were spent/i)).toBeVisible();
+	await expect(page.getByTestId('result').getByText(/the ingredients were spent/i)).toBeVisible();
 	await expect(page.getByText(/5 \/ 10/)).toBeVisible();
 	await expect(page.getByRole('button', { name: /next visitor/i })).toBeVisible();
 

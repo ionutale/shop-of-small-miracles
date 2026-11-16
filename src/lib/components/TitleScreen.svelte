@@ -7,8 +7,13 @@
 <ScreenShell title="A Shop of Small Miracles" kicker="a candlelit shop at the edge of a cold town">
 	<div class="title-page">
 		<p class="lede">
-			Brew small miracles from three essences for the people of a cold town. Keep the lamp lit, pay
-			the rent, and decide what the shop is for.
+			Keep the shop for <strong>21 days</strong>. Serve three visitors a day, pay the rent, and
+			choose what the shop becomes.
+		</p>
+
+		<p class="rule">
+			A potion is three ingredients; their <strong>main essences</strong> must cover the customer’s two
+			tags. One can be doubled.
 		</p>
 
 		<div class="actions">
@@ -32,6 +37,17 @@
 		border: 1px solid rgba(59, 42, 26, 0.2);
 		border-radius: 6px 18px 8px 15px;
 		background: rgba(255, 255, 255, 0.18);
+	}
+
+	.rule {
+		margin: 0;
+		padding: 0.6rem 0.75rem;
+		border-left: 2px solid rgba(176, 138, 79, 0.6);
+		border-radius: 0 8px 8px 0;
+		background: rgba(255, 255, 255, 0.16);
+		color: var(--ink-soft);
+		font-size: 0.95rem;
+		line-height: 1.45;
 	}
 
 	.lede {

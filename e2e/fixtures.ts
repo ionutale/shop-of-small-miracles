@@ -42,6 +42,7 @@ export function seededSave(overrides: Partial<SaveState> = {}): SaveState {
 		lastResult: null,
 		morningSeenDay: 21,
 		choices: [],
+		tutorialDone: true,
 		...overrides
 	};
 }
