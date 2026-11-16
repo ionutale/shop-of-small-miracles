@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { BADGES } from '../data/badges';
 	import { CHAPTERS, chapterForDay } from '../data/chapters';
 	import { characterById } from '../data/characters';
 	import { LETTERS, lettersUpTo } from '../data/letters';
@@ -26,6 +27,11 @@
 		})
 	);
 	const letters = $derived(lettersUpTo($game.day));
+	const honors = $derived.by(() => {
+		const owned = new Map($game.badges.map((badge) => [badge.id, badge.day]));
+		return BADGES.map((badge) => ({ ...badge, earnedDay: owned.get(badge.id) ?? null }));
+	});
+	const earnedHonors = $derived(honors.filter((badge) => badge.earnedDay !== null));
 </script>
 
 <ScreenShell title="The journal" kicker="the shop remembers what the ledger cannot hold">
@@ -58,6 +64,24 @@
 				<li class="face paper">
 					<p class="name hand">{entry.character.name}</p>
 					<p class="hint">{relationshipHint(entry.value)}</p>
+				</li>
+			{/each}
+		</ul>
+	</section>
+
+	<section class="honors" aria-labelledby="honors-title">
+		<h2 id="honors-title">Small honors</h2>
+		<p class="note">{earnedHonors.length} / {BADGES.length} earned.</p>
+		<ul class="honor-list" aria-labelledby="honors-title">
+			{#each honors as honor (honor.id)}
+				<li class="honor paper" class:earned={honor.earnedDay !== null}>
+					<p class="name hand">{honor.title}</p>
+					{#if honor.earnedDay !== null}
+						<p class="flavor">{honor.flavor}</p>
+						<p class="honor-day">earned day {honor.earnedDay}</p>
+					{:else}
+						<p class="hint">{honor.hint}</p>
+					{/if}
 				</li>
 			{/each}
 		</ul>
@@ -150,6 +174,7 @@
 	}
 
 	.cast-list,
+	.honor-list,
 	.letter-list {
 		display: grid;
 		gap: 0.7rem;
@@ -159,10 +184,36 @@
 	}
 
 	.face,
+	.honor,
 	.letter {
 		padding: 0.85rem 0.95rem;
 		border: 1px solid rgba(59, 42, 26, 0.2);
 		border-radius: 5px 14px 6px 12px;
+	}
+
+	.honor .name {
+		color: var(--ink-soft);
+	}
+
+	.honor.earned {
+		border-color: rgba(176, 138, 79, 0.55);
+	}
+
+	.honor.earned .name {
+		color: var(--burgundy);
+	}
+
+	.flavor {
+		margin: 0 0 0.3rem;
+		line-height: 1.5;
+	}
+
+	.honor-day {
+		margin: 0;
+		color: var(--brass-ink);
+		font-size: 0.78rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
 	}
 
 	.name {
