@@ -61,7 +61,7 @@ A new shop shows a persistent goal bar (day, next rent, visitors served) and a o
 
 ## Saving
 
-Progress lives in `localStorage` under `small-miracles:save:v1`. Every customer, brew, purchase, and phase change autosaves. A save that cannot be parsed (wrong version, impossible day, malformed fields) falls back to a fresh day-one shop with a dismissible recovery notice. Reset progress is two-step and keeps the sound and reduced-motion settings.
+Progress lives in `localStorage` under `small-miracles:save:v1`. Every customer, brew, purchase, and phase change autosaves. A save that cannot be parsed (wrong version, impossible day, malformed fields) falls back to a fresh day-one shop with a dismissible recovery notice. Reset progress is two-step and keeps the sound and reduced-motion settings, your career ledger, and your badges.
 
 ## Badges
 
@@ -75,7 +75,7 @@ The shop keeps a small career ledger in the save:
 
 Thirteen keepsake badges read that ledger (plus the current run's relationships) and are awarded automatically: First Light, Open for Business, The Long Bench, Paper Trail, The Whole Book, The Widow's Friend, Salt and Company, The Apprentice's Trust, Three Chairs, The Shop Endures, The Last Miracle, A Quiet Closing, and Chair Keeper. They are honors only — no bonuses, currency, or balance changes — and an award is never revoked.
 
-The Journal's **Small honors** section lists every badge: earned ones show their flavor line and `earned day N`, and locked ones show a hint. Reset progress clears the run but keeps the career ledger and the badge collection. Saves from before badges existed start both empty, and no badge is backfilled for past play.
+The Journal's **Small honors** section lists every badge: earned ones show their flavor line and `earned day N`, and locked ones show a hint. Reset progress clears the run but keeps the career ledger and the badge collection. Saves from before badges existed start both empty. No ledger badge is backfilled for past play; friendship honors read the current run.
 
 ## PWA and offline
 

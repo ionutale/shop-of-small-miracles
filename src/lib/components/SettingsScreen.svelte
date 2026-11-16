@@ -120,7 +120,8 @@
 			>
 				<h3 id="reset-title">Reset all progress?</h3>
 				<p id="reset-note">
-					This clears the save, the recipe book, every choice, and the ledger. It cannot be undone.
+					This clears the current run: the save, the recipe book, and every choice. Your career
+					ledger, badges, and settings are kept.
 				</p>
 				<div class="actions">
 					<button class="quiet" type="button" onclick={cancelReset}>Keep my shop</button>
