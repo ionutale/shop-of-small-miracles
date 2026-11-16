@@ -94,6 +94,129 @@ describe('game store', () => {
 		expect(after.servedVisitIds).toContain('widow-lamp');
 	});
 
+	it('counts a clean brew in the career ledger and awards First Light', () => {
+		brew(['H', 'Na', 'Cu']);
+		const after = get(game);
+
+		expect(after.records.cleanBrews).toBe(1);
+		expect(after.records.served).toBe(1);
+		expect(after.records.namedSeen).toEqual(["Widow's Lamp"]);
+		expect(after.badges).toEqual([{ id: 'first-light', day: 1 }]);
+	});
+
+	it('counts a mismatched brew as served but not clean or named', () => {
+		brew(['H', 'O', 'Ag']);
+		const after = get(game);
+
+		expect(after.lastResult?.kind).toBe('decline');
+		expect(after.records.served).toBe(1);
+		expect(after.records.cleanBrews).toBe(0);
+		expect(after.records.namedSeen).toEqual([]);
+		expect(after.badges).toEqual([]);
+	});
+
+	it('counts a polite decline as served and nothing more', () => {
+		decline();
+		const after = get(game);
+
+		expect(after.records.served).toBe(1);
+		expect(after.records.cleanBrews).toBe(0);
+		expect(after.records.namedSeen).toEqual([]);
+		expect(after.badges).toEqual([]);
+	});
+
+	it('lists a named potion in the ledger only once', () => {
+		initGame(
+			42,
+			serviceSave({
+				records: {
+					cleanBrews: 1,
+					served: 1,
+					namedSeen: ["Widow's Lamp"],
+					endings: [],
+					chairEndings: 0
+				}
+			})
+		);
+
+		brew(['H', 'Na', 'Cu']);
+		const after = get(game);
+
+		expect(after.records.namedSeen).toEqual(["Widow's Lamp"]);
+		expect(after.records.cleanBrews).toBe(2);
+		expect(after.records.served).toBe(2);
+	});
+
+	it('records the final ending once and counts a chair ending for a kept chair', () => {
+		initGame(
+			42,
+			serviceSave({
+				day: 21,
+				chapter: 3,
+				phase: 'chapterEnd',
+				coins: 200,
+				reputation: 5,
+				flags: ['keptTheChair']
+			})
+		);
+
+		settleRent();
+		expect(get(game).rentOutcome?.kind).toBe('paid');
+		leaveRentScene();
+
+		const closed = get(game);
+		expect(closed.phase).toBe('ending');
+		expect(closed.records.endings).toEqual(['shop-endures']);
+		expect(closed.records.chairEndings).toBe(1);
+		expect(closed.badges.map((badge) => badge.id)).toEqual(
+			expect.arrayContaining(['shop-endures', 'chair-keeper'])
+		);
+
+		leaveRentScene();
+		expect(get(game).records.endings).toEqual(['shop-endures']);
+		expect(get(game).records.chairEndings).toBe(1);
+	});
+
+	it('does not count a chair ending when the chair was given up', () => {
+		initGame(
+			42,
+			serviceSave({
+				day: 21,
+				chapter: 3,
+				phase: 'chapterEnd',
+				coins: 200,
+				reputation: 5,
+				flags: []
+			})
+		);
+
+		settleRent();
+		leaveRentScene();
+
+		const closed = get(game);
+		expect(closed.phase).toBe('ending');
+		expect(closed.records.endings).toEqual(['shop-endures']);
+		expect(closed.records.chairEndings).toBe(0);
+		expect(closed.badges.map((badge) => badge.id)).not.toContain('chair-keeper');
+	});
+
+	it('reloads the career ledger and badges from the save', () => {
+		brew(['H', 'Na', 'Cu']);
+		expect(get(game).badges).toEqual([{ id: 'first-light', day: 1 }]);
+
+		const stored = JSON.parse(localStorage.getItem(SAVE_KEY) ?? '{}');
+		expect(stored.records.cleanBrews).toBe(1);
+		expect(stored.records.served).toBe(1);
+		expect(stored.badges).toEqual([{ id: 'first-light', day: 1 }]);
+
+		initGame(99);
+		const restored = get(game);
+		expect(restored.records.cleanBrews).toBe(1);
+		expect(restored.records.served).toBe(1);
+		expect(restored.records.namedSeen).toEqual(["Widow's Lamp"]);
+		expect(restored.badges).toEqual([{ id: 'first-light', day: 1 }]);
+	});
+
 	it('brings the next visitor, then settles into a quiet day when the shelf runs out', () => {
 		brew(['H', 'Na', 'Cu']);
 		nextCustomer();

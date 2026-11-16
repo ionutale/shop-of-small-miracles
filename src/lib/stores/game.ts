@@ -2,9 +2,10 @@ import { get, writable } from 'svelte/store';
 import { VISITS_PER_DAY } from '../data/chapters';
 import { visitById } from '../data/characters';
 import { ELEMENTS } from '../data/elements';
-import { namePotion } from '../data/potions';
+import { namePotion, namedPotionFor } from '../data/potions';
 import { ownedUpgrades } from '../data/upgrades';
 import type { BrewOutcome, SaveState } from '../types';
+import { syncBadges } from '../game/badges';
 import { brewTags, canBrew, consume, judgeBrew } from '../game/brew';
 import { buyStock as buyStockState, buyUpgrade as buyUpgradeState } from '../game/economy';
 import {
@@ -14,7 +15,7 @@ import {
 	payRent as payRentState
 } from '../game/day';
 import { pickVisit } from '../game/eligibility';
-import { applyChoice } from '../game/story';
+import { applyChoice, selectEnding } from '../game/story';
 import { setSoundEnabled } from '../game/sound';
 import { createInitialSave, loadSave, saveGame, SAVE_KEY } from '../game/storage';
 
@@ -25,9 +26,21 @@ export const recovered = writable(false);
 
 let ready = false;
 
+/**
+ * Persists on every change. A change that earns a badge is first replaced by
+ * the synced save (which then saves on its own notification); `syncBadges`
+ * returns the same object when nothing is new, so this never loops.
+ */
 game.subscribe((state) => {
 	setSoundEnabled(state.settings.sound);
-	if (ready) saveGame(state);
+	if (!ready) return;
+
+	const synced = syncBadges(state);
+	if (synced !== state) {
+		game.set(synced);
+	} else {
+		saveGame(state);
+	}
 });
 
 export function initGame(seed = 42, overrides: Partial<SaveState> = {}): void {
@@ -102,6 +115,12 @@ export function brew(ids: readonly string[]): void {
 				}
 			];
 
+	const named = namedPotionFor(outcome.tags);
+	const namedSeen =
+		named && !current.records.namedSeen.includes(named.name)
+			? [...current.records.namedSeen, named.name]
+			: current.records.namedSeen;
+
 	game.set({
 		...current,
 		stock,
@@ -112,6 +131,12 @@ export function brew(ids: readonly string[]): void {
 		servedVisitIds: [...current.servedVisitIds, visit.id],
 		apprenticeUsedToday,
 		warmStoveUsedToday,
+		records: {
+			...current.records,
+			cleanBrews: current.records.cleanBrews + (outcome.kind === 'clean' ? 1 : 0),
+			served: current.records.served + 1,
+			namedSeen
+		},
 		lastResult: outcome
 	});
 }
@@ -138,6 +163,7 @@ export function decline(): void {
 		...current,
 		servedToday: current.servedToday + 1,
 		servedVisitIds: [...current.servedVisitIds, visit.id],
+		records: { ...current.records, served: current.records.served + 1 },
 		lastResult: outcome
 	});
 }
@@ -270,7 +296,28 @@ export function settleRent(): void {
 
 /** Dismisses the paid-or-setback page and shows the next morning or ending. */
 export function leaveRentScene(): void {
-	game.set(continueAfterRentState(get(game)));
+	game.set(recordEnding(continueAfterRentState(get(game))));
+}
+
+/**
+ * The final ledger opens the ending; the career ledger remembers it once.
+ * A chair ending counts only when this save kept the chair and the ending
+ * itself is newly recorded, so replaying the scene cannot tally twice.
+ */
+function recordEnding(state: SaveState): SaveState {
+	if (state.phase !== 'ending') return state;
+
+	const id = selectEnding(state).id;
+	if (state.records.endings.includes(id)) return state;
+
+	return {
+		...state,
+		records: {
+			...state.records,
+			endings: [...state.records.endings, id],
+			chairEndings: state.records.chairEndings + (state.flags.includes('keptTheChair') ? 1 : 0)
+		}
+	};
 }
 
 function withSetbackStory(state: SaveState): SaveState {

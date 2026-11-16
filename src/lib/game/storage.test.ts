@@ -181,7 +181,12 @@ describe('storage', () => {
 		resetGame();
 
 		expect(get(game).records).toEqual(SEEDED_RECORDS);
-		expect(get(game).badges).toEqual([{ id: 'first-light', day: 2 }]);
+		// Seeding the ledger also earns its keepsakes, alongside the kept first-light.
+		expect(get(game).badges).toEqual([
+			{ id: 'first-light', day: 2 },
+			{ id: 'quiet-closing', day: 1 },
+			{ id: 'chair-keeper', day: 1 }
+		]);
 		expect(get(game).day).toBe(1);
 		expect(get(game).flags).toEqual([]);
 	});
