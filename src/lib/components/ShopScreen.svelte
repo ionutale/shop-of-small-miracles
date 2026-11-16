@@ -19,6 +19,7 @@
 	import Cauldron from './Cauldron.svelte';
 	import CustomerCard from './CustomerCard.svelte';
 	import EndingPage from './EndingPage.svelte';
+	import GoalBar from './GoalBar.svelte';
 	import IngredientShelf from './IngredientShelf.svelte';
 	import MarketScreen from './MarketScreen.svelte';
 	import MorningScene from './MorningScene.svelte';
@@ -149,6 +150,8 @@
 				</p>
 			</div>
 		</header>
+
+		<GoalBar />
 
 		{#if !$game.rentOutcome}
 			<MorningScene />
